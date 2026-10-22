@@ -1,6 +1,6 @@
 {
-  "version": "1.2.5",
+  "version": "1.2.6",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "25fc50fede2dd98536b1e268ab8c3c95cac377d7318ae9e112ea15d7cbd642a9",
-  "notes": "新增导出进度独立窗口，导出时始终可见；快速导出也会至少显示 350ms 进度。"
+  "sha256": "ff2db46c26645dd758fc30060daf4adbe880055d74d6bdc732eabf1aeb8726fc",
+  "notes": "修复剪辑窗口播放按钮被视频表面遮挡的问题：时间轴与底部控制栏改为独立置顶层，播放、导出、复制等按钮可正常点击。"
 }
