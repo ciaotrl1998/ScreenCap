@@ -1,0 +1,2 @@
+# ScreenCap
+Convenient screenshot tool
