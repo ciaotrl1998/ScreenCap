@@ -1,6 +1,6 @@
 {
-  "version": "1.2.6",
+  "version": "1.2.7",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "ff2db46c26645dd758fc30060daf4adbe880055d74d6bdc732eabf1aeb8726fc",
-  "notes": "修复剪辑窗口播放按钮被视频表面遮挡的问题：时间轴与底部控制栏改为独立置顶层，播放、导出、复制等按钮可正常点击。"
+  "sha256": "83296ad47dc65fd06ff41b39102f713167fdd2081bf3ef6a4d7bdb45d89a3d05",
+  "notes": "修复播放按钮和空格无法恢复播放的问题；时间轴和底部控制栏恢复到主窗口内，随窗口一起移动。"
 }

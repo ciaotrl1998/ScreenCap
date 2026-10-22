@@ -80,8 +80,6 @@ namespace ScreenCap.UI
             _positionTimer.Start();
 
             Loaded += OnLoaded;
-            Loaded += (s, e) => UpdateBottomPopupOffset();
-            RootGrid.SizeChanged += (s, e) => UpdateBottomPopupOffset();
             Closed += OnClosed;
             PreviewKeyDown += OnPreviewKeyDown;
 
@@ -109,14 +107,6 @@ namespace ScreenCap.UI
             var area = SystemParameters.WorkArea;
             Width = Math.Max(MinWidth, Math.Min(1120, area.Width * 0.8));
             Height = Math.Max(MinHeight, Math.Min(820, area.Height * 0.88));
-        }
-
-        private void UpdateBottomPopupOffset()
-        {
-            if (BottomPopup?.Child is FrameworkElement child)
-            {
-                BottomPopup.VerticalOffset = Math.Max(0, RootGrid.ActualHeight - child.ActualHeight);
-            }
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -325,6 +315,12 @@ namespace ScreenCap.UI
         {
             if (!_initialized || _player == null)
             {
+                return;
+            }
+
+            if (_player.State == VLCState.Paused)
+            {
+                _player.SetPause(false);
                 return;
             }
 

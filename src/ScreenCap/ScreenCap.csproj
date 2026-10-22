@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -12,9 +12,9 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>ScreenCap</AssemblyName>
     <RootNamespace>ScreenCap</RootNamespace>
-    <Version>1.2.6</Version>
-    <FileVersion>1.2.6.0</FileVersion>
-    <AssemblyVersion>1.2.6.0</AssemblyVersion>
+    <Version>1.2.7</Version>
+    <FileVersion>1.2.7.0</FileVersion>
+    <AssemblyVersion>1.2.7.0</AssemblyVersion>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

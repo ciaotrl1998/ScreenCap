@@ -30,6 +30,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="38" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" Background="#141518" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
@@ -63,98 +65,81 @@
             </Grid>
         </Border>
 
-        <Popup x:Name="BottomPopup"
-               PlacementTarget="{Binding ElementName=RootGrid}"
-               Placement="Relative"
-               HorizontalOffset="0"
-               VerticalOffset="0"
-               StaysOpen="True"
-               AllowsTransparency="True"
-               PopupAnimation="None"
-               IsOpen="True">
-            <Grid Width="{Binding ActualWidth, ElementName=RootGrid}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <Border Grid.Row="2" Background="#141518" Padding="18,10">
+            <local:TimelineControl x:Name="Timeline" Height="46" />
+        </Border>
 
-                <Border Grid.Row="0" Background="#141518" Padding="18,10">
-                    <local:TimelineControl x:Name="Timeline" Height="46" />
-                </Border>
+        <Border Grid.Row="3"
+                Background="#1B1D22"
+                BorderBrush="{StaticResource StrokeBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="18,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <Border Grid.Row="1"
-                        Background="#1B1D22"
-                        BorderBrush="{StaticResource StrokeBrush}"
-                        BorderThickness="0,1,0,0"
-                        Padding="18,12">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                <Button x:Name="PlayButton"
+                        Grid.Column="0"
+                        Content="▶"
+                        Style="{StaticResource BaseButton}"
+                        Padding="0"
+                        Width="46"
+                        Height="38"
+                        FontSize="15"
+                        Click="Play_Click" />
 
-                        <Button x:Name="PlayButton"
-                                Grid.Column="0"
-                                Content="▶"
-                                Style="{StaticResource BaseButton}"
-                                Padding="0"
-                                Width="46"
-                                Height="38"
-                                FontSize="15"
-                                Click="Play_Click" />
+                <TextBlock x:Name="TimeText"
+                           Grid.Column="1"
+                           Text="00:00:00.000 / 00:00:00.000"
+                           Foreground="#E8E9EE"
+                           FontFamily="Consolas"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           Margin="14,0,0,0" />
 
-                        <TextBlock x:Name="TimeText"
-                                   Grid.Column="1"
-                                   Text="00:00:00.000 / 00:00:00.000"
-                                   Foreground="#E8E9EE"
-                                   FontFamily="Consolas"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"
-                                   Margin="14,0,0,0" />
+                <TextBlock x:Name="StatusText"
+                           Grid.Column="2"
+                           Foreground="{StaticResource DimTextBrush}"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           HorizontalAlignment="Right"
+                           Margin="16,0,16,0" />
 
-                        <TextBlock x:Name="StatusText"
-                                   Grid.Column="2"
-                                   Foreground="{StaticResource DimTextBrush}"
-                                   FontSize="12"
-                                   VerticalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis"
-                                   HorizontalAlignment="Right"
-                                   Margin="16,0,16,0" />
+                <Button x:Name="OpenFolderButton"
+                        Grid.Column="3"
+                        Content="打开文件夹"
+                        Style="{StaticResource GhostButton}"
+                        Visibility="Collapsed"
+                        Margin="0,0,8,0"
+                        Click="OpenFolder_Click" />
 
-                        <Button x:Name="OpenFolderButton"
-                                Grid.Column="3"
-                                Content="打开文件夹"
-                                Style="{StaticResource GhostButton}"
-                                Visibility="Collapsed"
-                                Margin="0,0,8,0"
-                                Click="OpenFolder_Click" />
+                <Button x:Name="ExportButton"
+                        Grid.Column="4"
+                        Content="导出"
+                        Style="{StaticResource RosePrimaryButton}"
+                        MinWidth="96"
+                        Margin="0,0,8,0"
+                        Click="Export_Click" />
 
-                        <Button x:Name="ExportButton"
-                                Grid.Column="4"
-                                Content="导出"
-                                Style="{StaticResource RosePrimaryButton}"
-                                MinWidth="96"
-                                Margin="0,0,8,0"
-                                Click="Export_Click" />
-
-                        <Button x:Name="CopyButton"
-                                Grid.Column="5"
-                                Content="复制到剪贴板"
-                                Style="{StaticResource RosePrimaryButton}"
-                                MinWidth="128"
-                                ToolTip="将剪辑后的 mp4 作为文件复制到剪贴板"
-                                Click="Copy_Click" />
-                    </Grid>
-                </Border>
+                <Button x:Name="CopyButton"
+                        Grid.Column="5"
+                        Content="复制到剪贴板"
+                        Style="{StaticResource RosePrimaryButton}"
+                        MinWidth="128"
+                        ToolTip="将剪辑后的 mp4 作为文件复制到剪贴板"
+                        Click="Copy_Click" />
             </Grid>
-        </Popup>
+        </Border>
 
         <Border x:Name="BusyOverlay"
-                Grid.RowSpan="2"
+                Grid.RowSpan="4"
                 Background="#CC0A0B0E"
                 Visibility="Collapsed">
             <Border Background="{StaticResource PanelBrush}"
