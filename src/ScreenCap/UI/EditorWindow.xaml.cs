@@ -37,6 +37,7 @@ namespace ScreenCap.UI
         private bool _initialized;
         private bool _ended;
         private bool _restarting;
+        private bool _pauseOnFirstFrame;
         private bool _closing;
         private long? _pendingSeekMs;
         private long _lastPlayerMs = -1;
@@ -133,8 +134,8 @@ namespace ScreenCap.UI
                     ShowPreviewError("无法预览该文件，但导出与复制仍然可用。")));
 
                 _media = new VlcMedia(_libVlc, _sourcePath, FromType.FromPath);
+                _pauseOnFirstFrame = true;
                 _player.Play(_media);
-                _player.SetPause(true);
                 _initialized = true;
             }
             catch (Exception ex)
@@ -174,6 +175,12 @@ namespace ScreenCap.UI
 
                 _restarting = false;
                 _ended = false;
+
+                if (_pauseOnFirstFrame)
+                {
+                    _pauseOnFirstFrame = false;
+                    _player.SetPause(true);
+                }
 
                 try
                 {

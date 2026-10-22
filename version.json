@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.2.8",
+  "version": "1.2.9",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "926b80aa76d94b4a559dbc8e87e245e37a9807b2028adfe2d95a53eebd18c053",
-  "notes": "播放结束后再次播放会从头开始，而不是从结尾继续一小段。"
+  "sha256": "42dc2122856dda048e6fa25985b5b0fcff8aebf189a4db32f60ab2b5c96c95c0",
+  "notes": "修复进入剪辑窗后首次播放画面延迟/卡住的问题：等首帧就绪后再暂停，避免打开阶段立即暂停。"
 }
