@@ -1,0 +1,55 @@
+<Window x:Class="ScreenCap.UI.ExportProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ScreenCap"
+        Width="380"
+        Height="168"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Microsoft YaHei UI">
+    <Border Background="#F01B1D22"
+            BorderBrush="#33FFFFFF"
+            BorderThickness="1"
+            CornerRadius="10"
+            Padding="20,16">
+        <StackPanel>
+            <TextBlock x:Name="TitleText"
+                       Text="正在导出…"
+                       Foreground="#E8E9EE"
+                       FontSize="14" />
+
+            <ProgressBar x:Name="Progress"
+                         Height="6"
+                         Minimum="0"
+                         Maximum="100"
+                         Margin="0,14,0,10"
+                         Foreground="#E5394A"
+                         Background="#2A2C33"
+                         BorderThickness="0" />
+
+            <Grid>
+                <TextBlock x:Name="PercentText"
+                           Text="0%"
+                           Foreground="#B9BBC4"
+                           FontSize="12"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Center" />
+                <Button x:Name="CancelButton"
+                        Content="取消"
+                        Width="64"
+                        Height="28"
+                        HorizontalAlignment="Right"
+                        Background="#2A2C33"
+                        Foreground="#E8E9EE"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Click="Cancel_Click" />
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

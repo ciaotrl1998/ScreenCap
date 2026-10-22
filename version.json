@@ -1,6 +1,6 @@
 {
-  "version": "1.2.4",
+  "version": "1.2.5",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "71ce5d6c194cbaccb82f8b7631205225daf50fd76b62988d25c475843e3ad082",
-  "notes": "支持导出时选择保存目录并记住上次目录；新增启动检查更新与一键更新，无需重复安装。"
+  "sha256": "25fc50fede2dd98536b1e268ab8c3c95cac377d7318ae9e112ea15d7cbd642a9",
+  "notes": "新增导出进度独立窗口，导出时始终可见；快速导出也会至少显示 350ms 进度。"
 }

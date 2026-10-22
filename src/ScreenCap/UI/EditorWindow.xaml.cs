@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -28,6 +28,7 @@ namespace ScreenCap.UI
         private VlcMediaPlayer _player;
         private VlcMedia _media;
         private CancellationTokenSource _exportCts;
+        private ExportProgressWindow _busyWindow;
         private DispatcherTimer _loadTimeoutTimer;
         private string _posterPath;
         private string _lastOutputPath;
@@ -666,6 +667,7 @@ namespace ScreenCap.UI
         private async Task<bool> RunExporterAsync(string ffmpeg, string input, double start, double duration, string output, string title, bool gif)
         {
             _exportCts = new CancellationTokenSource();
+            var startedAt = Stopwatch.StartNew();
             ShowBusy(title);
 
             try
@@ -694,6 +696,17 @@ namespace ScreenCap.UI
             }
             finally
             {
+                long remaining = 350 - startedAt.ElapsedMilliseconds;
+                if (remaining > 0)
+                {
+                    try
+                    {
+                        await Task.Delay((int)remaining);
+                    }
+                    catch
+                    {
+                    }
+                }
                 _exportCts.Dispose();
                 _exportCts = null;
                 HideBusy();
@@ -778,31 +791,45 @@ namespace ScreenCap.UI
             {
             }
 
-            VideoView.Visibility = Visibility.Collapsed;
-            BusyTitle.Text = title;
-            BusyProgress.Value = 0;
-            BusyPercent.Text = "0%";
-            CancelExportButton.IsEnabled = true;
-            BusyOverlay.Visibility = Visibility.Visible;
+            _busyWindow?.Close();
+            _busyWindow = new ExportProgressWindow { Owner = this };
+            _busyWindow.CancelClicked += CancelExport;
+            _busyWindow.Show();
+            _busyWindow.SetTitle(title);
+            _busyWindow.SetProgress(0);
+            _busyWindow.SetCancelEnabled(true);
         }
 
         private void SetBusyProgress(double ratio)
         {
-            double value = Math.Max(0, Math.Min(100, ratio * 100));
-            BusyProgress.Value = value;
-            BusyPercent.Text = value.ToString("0") + "%";
+            _busyWindow?.SetProgress(ratio);
         }
 
         private void HideBusy()
         {
-            BusyOverlay.Visibility = Visibility.Collapsed;
-            VideoView.Visibility = Visibility.Visible;
+            if (_busyWindow == null)
+            {
+                return;
+            }
+            try
+            {
+                _busyWindow.Close();
+            }
+            catch
+            {
+            }
+            _busyWindow = null;
         }
 
         private void CancelExport_Click(object sender, RoutedEventArgs e)
         {
-            CancelExportButton.IsEnabled = false;
-            BusyTitle.Text = "正在取消…";
+            CancelExport();
+        }
+
+        private void CancelExport()
+        {
+            _busyWindow?.SetTitle("正在取消…");
+            _busyWindow?.SetCancelEnabled(false);
             try
             {
                 _exportCts?.Cancel();
