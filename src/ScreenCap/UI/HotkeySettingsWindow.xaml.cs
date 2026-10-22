@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
@@ -20,7 +20,9 @@ namespace ScreenCap.UI
             _apply = apply;
             ComboText.Text = _combo;
             QualitySlider.Value = Math.Max(10, Math.Min(100, settings.Quality));
+            GifFpsSlider.Value = Math.Max(5, Math.Min(30, settings.GifFramerate));
             QualityText.Text = ((int)Math.Round(QualitySlider.Value)).ToString();
+            GifFpsText.Text = ((int)Math.Round(GifFpsSlider.Value)).ToString();
             SoundCheck.IsChecked = settings.RecordSystemAudio;
             PreviewKeyDown += OnPreviewKeyDown;
             Loaded += (s, e) =>
@@ -35,6 +37,14 @@ namespace ScreenCap.UI
             if (QualityText != null)
             {
                 QualityText.Text = ((int)Math.Round(e.NewValue)).ToString();
+            }
+        }
+
+        private void GifFps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (GifFpsText != null)
+            {
+                GifFpsText.Text = ((int)Math.Round(e.NewValue)).ToString();
             }
         }
 
@@ -167,6 +177,7 @@ namespace ScreenCap.UI
             if (error == null)
             {
                 _settings.Quality = (int)Math.Round(QualitySlider.Value);
+                _settings.GifFramerate = (int)Math.Round(GifFpsSlider.Value);
                 _settings.RecordSystemAudio = SoundCheck.IsChecked == true;
                 _settings.Save();
                 DialogResult = true;

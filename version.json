@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.2.5",
+  "version": "1.2.6",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "fd56cfce391da0d3185ed2f808bf2c1a4e79f123309ff1fe0d7e0c4e82b65f7c",
-  "notes": "回退到 1.2.5 版本。"
+  "sha256": "d7e6f0ccdefcf7bc19b5440e2ac2d7b2e11ad69013c7099f2e11faa95f3dfa97",
+  "notes": "设置中新增 GIF 帧率（5-30fps），GIF 导出按该帧率生成。"
 }

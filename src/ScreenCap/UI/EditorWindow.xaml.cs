@@ -675,7 +675,7 @@ namespace ScreenCap.UI
                 var progress = new Progress<double>(SetBusyProgress);
                 if (gif)
                 {
-                    await FfmpegExporter.ExportGifAsync(ffmpeg, input, start, duration, output, progress, _exportCts.Token);
+                    await FfmpegExporter.ExportGifAsync(ffmpeg, input, start, duration, output, _isGif ? _settings.GifFramerate : 15, progress, _exportCts.Token);
                 }
                 else
                 {

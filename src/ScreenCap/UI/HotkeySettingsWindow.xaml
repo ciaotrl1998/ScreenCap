@@ -1,9 +1,9 @@
-<Window x:Class="ScreenCap.UI.HotkeySettingsWindow"
+﻿<Window x:Class="ScreenCap.UI.HotkeySettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="设置"
         Width="470"
-        Height="470"
+        Height="570"
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="{StaticResource PanelBrush}"
@@ -89,6 +89,38 @@
                                Margin="12,0,0,0" />
                 </Grid>
                 <TextBlock Text="数值越高画质越好、文件越大"
+                           Foreground="{StaticResource DimTextBrush}"
+                           FontSize="12"
+                           Margin="0,4,0,0" />
+
+                <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
+
+                <TextBlock Text="GIF 帧率" Foreground="#B9BBC4" FontSize="12" />
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider x:Name="GifFpsSlider"
+                            Minimum="5"
+                            Maximum="30"
+                            TickFrequency="1"
+                            IsSnapToTickEnabled="True"
+                            Value="15"
+                            VerticalAlignment="Center"
+                            ValueChanged="GifFps_ValueChanged" />
+                    <TextBlock x:Name="GifFpsText"
+                               Grid.Column="1"
+                               Text="15"
+                               Foreground="#E8E9EE"
+                               FontFamily="Consolas"
+                               FontSize="13"
+                               Width="34"
+                               TextAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="12,0,0,0" />
+                </Grid>
+                <TextBlock Text="仅影响 GIF 导出；帧率越高越流畅，文件越大"
                            Foreground="{StaticResource DimTextBrush}"
                            FontSize="12"
                            Margin="0,4,0,0" />

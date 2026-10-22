@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -12,6 +12,7 @@ namespace ScreenCap.Core
         public bool ShowCursor { get; set; } = true;
         public bool RecordSystemAudio { get; set; } = true;
         public bool RecordGif { get; set; }
+        public int GifFramerate { get; set; } = 15;
         public string RecordingsFolder { get; set; } = "";
         public string ExportDirectory { get; set; } = "";
         public string FfmpegPath { get; set; } = "";
@@ -97,6 +98,7 @@ namespace ScreenCap.Core
             if (string.IsNullOrWhiteSpace(Hotkey)) Hotkey = "Alt+Shift+Q";
             Framerate = Math.Max(15, Math.Min(120, Framerate));
             Quality = Math.Max(10, Math.Min(100, Quality));
+            GifFramerate = Math.Max(5, Math.Min(30, GifFramerate));
             ExportDirectory = ExportDirectory?.Trim() ?? "";
         }
     }
