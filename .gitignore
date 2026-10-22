@@ -1,0 +1,17 @@
+.vs/
+bin/
+obj/
+packages/
+TestResults/
+
+dist/*
+!dist/installer/
+!dist/installer/ScreenCap.iss
+dist/installer/*.exe
+
+tools/ffmpeg.exe
+tools/*.zip
+
+*.user
+*.suo
+*.pdb

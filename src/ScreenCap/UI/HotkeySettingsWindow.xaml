@@ -1,0 +1,123 @@
+<Window x:Class="ScreenCap.UI.HotkeySettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="设置"
+        Width="470"
+        Height="470"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="{StaticResource PanelBrush}"
+        Foreground="{StaticResource TextBrush}"
+        FontFamily="Microsoft YaHei UI"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        Topmost="True"
+        UseLayoutRounding="True">
+    <Border BorderBrush="{StaticResource StrokeBrush}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Background="#141518" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                    <Ellipse Width="8" Height="8" Fill="#E5394A" Margin="0,0,10,0" />
+                    <TextBlock Text="设置" FontSize="13" Foreground="#D7D9E0" VerticalAlignment="Center" />
+                </StackPanel>
+                <Button Content="✕"
+                        Style="{StaticResource IconButton}"
+                        HorizontalAlignment="Right"
+                        Click="Close_Click" />
+            </Grid>
+
+            <StackPanel Grid.Row="1" Margin="24,16,24,0">
+                <TextBlock Text="快捷键" Foreground="#B9BBC4" FontSize="12" />
+                <Border x:Name="CaptureBox"
+                        Background="#0E0F12"
+                        BorderBrush="{StaticResource AccentBrush}"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="16,12"
+                        Margin="0,8,0,0"
+                        Focusable="True"
+                        MouseLeftButtonDown="CaptureBox_MouseLeftButtonDown">
+                    <TextBlock x:Name="ComboText"
+                               Text="Alt+Shift+Q"
+                               FontFamily="Consolas"
+                               FontSize="19"
+                               HorizontalAlignment="Center"
+                               Foreground="#E8E9EE" />
+                </Border>
+                <TextBlock Text="需包含 Ctrl / Alt / Shift / Win 中的至少一个；Esc 取消"
+                           Foreground="{StaticResource DimTextBrush}"
+                           FontSize="12"
+                           Margin="0,8,0,0" />
+                <TextBlock x:Name="ErrorText"
+                           Foreground="#FF6B6B"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           Visibility="Collapsed"
+                           Margin="0,8,0,0" />
+
+                <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
+
+                <TextBlock Text="画质" Foreground="#B9BBC4" FontSize="12" />
+                <Grid Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider x:Name="QualitySlider"
+                            Minimum="10"
+                            Maximum="100"
+                            TickFrequency="5"
+                            IsSnapToTickEnabled="True"
+                            Value="75"
+                            VerticalAlignment="Center"
+                            ValueChanged="Quality_ValueChanged" />
+                    <TextBlock x:Name="QualityText"
+                               Grid.Column="1"
+                               Text="75"
+                               Foreground="#E8E9EE"
+                               FontFamily="Consolas"
+                               FontSize="13"
+                               Width="34"
+                               TextAlignment="Right"
+                               VerticalAlignment="Center"
+                               Margin="12,0,0,0" />
+                </Grid>
+                <TextBlock Text="数值越高画质越好、文件越大"
+                           Foreground="{StaticResource DimTextBrush}"
+                           FontSize="12"
+                           Margin="0,4,0,0" />
+
+                <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
+
+                <TextBlock Text="录制声音" Foreground="#B9BBC4" FontSize="12" />
+                <CheckBox x:Name="SoundCheck"
+                          Content="录制系统声音（扬声器 / 耳机）"
+                          Foreground="#E8E9EE"
+                          FontSize="13"
+                          IsChecked="True"
+                          Margin="0,8,0,0" />
+                <TextBlock Text="关闭后只录画面，不录系统声音"
+                           Foreground="{StaticResource DimTextBrush}"
+                           FontSize="12"
+                           Margin="0,6,0,0" />
+            </StackPanel>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="24,16">
+                <Button Content="取消"
+                        Style="{StaticResource GhostButton}"
+                        Margin="0,0,8,0"
+                        Click="Cancel_Click" />
+                <Button Content="保存"
+                        Style="{StaticResource PrimaryButton}"
+                        MinWidth="88"
+                        Click="Save_Click" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,174 @@
+<Window x:Class="ScreenCap.UI.EditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ScreenCap.UI"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
+        Title="编辑录屏"
+        Width="1060"
+        Height="760"
+        MinWidth="760"
+        MinHeight="480"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        Background="{StaticResource BgBrush}"
+        Foreground="{StaticResource TextBrush}"
+        FontFamily="Microsoft YaHei UI"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+    <Window.Resources>
+        <Style x:Key="RosePrimaryButton" BasedOn="{StaticResource PrimaryButton}" TargetType="Button">
+            <Setter Property="Background" Value="#E5394A" />
+        </Style>
+    </Window.Resources>
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="38" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Background="#141518" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0">
+                <Ellipse Width="8" Height="8" Fill="#E5394A" Margin="0,0,10,0" />
+                <TextBlock x:Name="TitleText" Text="编辑录屏" FontSize="13" Foreground="#D7D9E0" VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Button Content="—" Style="{StaticResource IconButton}" Click="Minimize_Click" />
+                <Button x:Name="MaximizeButton" Content="□" Style="{StaticResource IconButton}" Click="Maximize_Click" />
+                <Button Content="✕" Style="{StaticResource IconButton}" Click="Close_Click" />
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Background="Black">
+            <Grid Background="Black">
+                <vlc:VideoView x:Name="VideoView" Background="Black">
+                    <Grid x:Name="PreviewCover" Background="Black" IsHitTestVisible="False">
+                        <Image x:Name="PosterImage" Stretch="Uniform" />
+                        <TextBlock x:Name="PreviewError"
+                                   Visibility="Collapsed"
+                                   Foreground="#B9BBC4"
+                                   FontSize="13"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   MaxWidth="520"
+                                   TextWrapping="Wrap" />
+                    </Grid>
+                </vlc:VideoView>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2" Background="#141518" Padding="18,10">
+            <local:TimelineControl x:Name="Timeline" Height="46" />
+        </Border>
+
+        <Border Grid.Row="3"
+                Background="#1B1D22"
+                BorderBrush="{StaticResource StrokeBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="18,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="PlayButton"
+                        Grid.Column="0"
+                        Content="▶"
+                        Style="{StaticResource BaseButton}"
+                        Padding="0"
+                        Width="46"
+                        Height="38"
+                        FontSize="15"
+                        Click="Play_Click" />
+
+                <TextBlock x:Name="TimeText"
+                           Grid.Column="1"
+                           Text="00:00:00.000 / 00:00:00.000"
+                           Foreground="#E8E9EE"
+                           FontFamily="Consolas"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           Margin="14,0,0,0" />
+
+                <TextBlock x:Name="StatusText"
+                           Grid.Column="2"
+                           Foreground="{StaticResource DimTextBrush}"
+                           FontSize="12"
+                           VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis"
+                           HorizontalAlignment="Right"
+                           Margin="16,0,16,0" />
+
+                <Button x:Name="OpenFolderButton"
+                        Grid.Column="3"
+                        Content="打开文件夹"
+                        Style="{StaticResource GhostButton}"
+                        Visibility="Collapsed"
+                        Margin="0,0,8,0"
+                        Click="OpenFolder_Click" />
+
+                <Button x:Name="ExportButton"
+                        Grid.Column="4"
+                        Content="导出"
+                        Style="{StaticResource RosePrimaryButton}"
+                        MinWidth="96"
+                        Margin="0,0,8,0"
+                        Click="Export_Click" />
+
+                <Button x:Name="CopyButton"
+                        Grid.Column="5"
+                        Content="复制到剪贴板"
+                        Style="{StaticResource RosePrimaryButton}"
+                        MinWidth="128"
+                        ToolTip="将剪辑后的 mp4 作为文件复制到剪贴板"
+                        Click="Copy_Click" />
+            </Grid>
+        </Border>
+
+        <Border x:Name="BusyOverlay"
+                Grid.RowSpan="4"
+                Background="#CC0A0B0E"
+                Visibility="Collapsed">
+            <Border Background="{StaticResource PanelBrush}"
+                    BorderBrush="{StaticResource StrokeBrush}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="24"
+                    Width="380"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock x:Name="BusyTitle" Text="正在导出…" FontSize="14" Foreground="#E8E9EE" />
+                    <ProgressBar x:Name="BusyProgress"
+                                 Height="6"
+                                 Minimum="0"
+                                 Maximum="100"
+                                 Margin="0,18,0,10"
+                                 Foreground="#E5394A"
+                                 Background="#33353C"
+                                 BorderThickness="0" />
+                    <TextBlock x:Name="BusyPercent" Text="0%" Foreground="{StaticResource DimTextBrush}" FontSize="12" />
+                    <Button x:Name="CancelExportButton"
+                            Content="取消"
+                            Style="{StaticResource GhostButton}"
+                            HorizontalAlignment="Right"
+                            Margin="0,16,0,0"
+                            Click="CancelExport_Click" />
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</Window>

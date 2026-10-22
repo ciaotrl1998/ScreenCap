@@ -1,0 +1,44 @@
+<Window x:Class="ScreenCap.Capture.SelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ScreenCap"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="False"
+        Background="Black"
+        ShowInTaskbar="False"
+        Topmost="True"
+        WindowStartupLocation="Manual"
+        Opacity="0"
+        Cursor="Cross"
+        Focusable="True"
+        UseLayoutRounding="False">
+    <Grid Background="Black">
+        <Image x:Name="Backdrop" Stretch="Fill" />
+        <Canvas x:Name="Root" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent">
+            <Rectangle x:Name="ShadeTop" Fill="#9E000000" />
+            <Rectangle x:Name="ShadeBottom" Fill="#9E000000" />
+            <Rectangle x:Name="ShadeLeft" Fill="#9E000000" />
+            <Rectangle x:Name="ShadeRight" Fill="#9E000000" />
+            <Rectangle x:Name="SelectionBorder" Stroke="#4C9BFF" Fill="Transparent" Visibility="Collapsed" />
+            <Border x:Name="SizeBadge" Background="#E60B0C10" CornerRadius="3" Visibility="Collapsed">
+                <TextBlock x:Name="SizeText" Foreground="White" FontFamily="Consolas" />
+            </Border>
+        </Canvas>
+        <Border x:Name="HintBadge"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                Margin="0,30,0,0"
+                Background="#D90B0C10"
+                BorderBrush="#26FFFFFF"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="14,8"
+                IsHitTestVisible="False">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse Width="8" Height="8" Fill="#E5394A" VerticalAlignment="Center" Margin="0,0,9,0" />
+                <TextBlock Text="移动到窗口单击选中，或拖动鼠标框选　·　Esc 取消" Foreground="#F2F3F5" FontSize="13" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

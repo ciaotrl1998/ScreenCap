@@ -1,0 +1,6 @@
+{
+  "version": "1.2.4",
+  "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
+  "sha256": "71ce5d6c194cbaccb82f8b7631205225daf50fd76b62988d25c475843e3ad082",
+  "notes": "支持导出时选择保存目录并记住上次目录；新增启动检查更新与一键更新，无需重复安装。"
+}
