@@ -295,6 +295,7 @@ namespace ScreenCap.UI
             if (actualSeconds >= Timeline.OutPoint - 0.03)
             {
                 _player.SetPause(true);
+                _ended = true;
                 _lastPlayerMs = -1;
                 Timeline.Position = Timeline.OutPoint;
                 UpdateTimeText();
@@ -318,6 +319,18 @@ namespace ScreenCap.UI
                 return;
             }
 
+            if (_restarting)
+            {
+                return;
+            }
+
+            if (_ended || Timeline.Position >= Timeline.OutPoint - 0.05)
+            {
+                _ended = false;
+                _ = RestartPlayerAsync(Timeline.InPoint);
+                return;
+            }
+
             if (_player.State == VLCState.Paused)
             {
                 _player.SetPause(false);
@@ -327,24 +340,6 @@ namespace ScreenCap.UI
             if (_player.IsPlaying)
             {
                 _player.Pause();
-                return;
-            }
-
-            if (_restarting)
-            {
-                return;
-            }
-
-            if (_ended)
-            {
-                double start = Timeline.Position < Timeline.OutPoint - 0.05 ? Timeline.Position : Timeline.InPoint;
-                _ = RestartPlayerAsync(start);
-                return;
-            }
-
-            if (Timeline.Position >= Timeline.OutPoint - 0.1)
-            {
-                _ = RestartPlayerAsync(Timeline.InPoint);
                 return;
             }
 

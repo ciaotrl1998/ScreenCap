@@ -1,6 +1,6 @@
-{
-  "version": "1.2.7",
+﻿{
+  "version": "1.2.8",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "83296ad47dc65fd06ff41b39102f713167fdd2081bf3ef6a4d7bdb45d89a3d05",
-  "notes": "修复播放按钮和空格无法恢复播放的问题；时间轴和底部控制栏恢复到主窗口内，随窗口一起移动。"
+  "sha256": "926b80aa76d94b4a559dbc8e87e245e37a9807b2028adfe2d95a53eebd18c053",
+  "notes": "播放结束后再次播放会从头开始，而不是从结尾继续一小段。"
 }
