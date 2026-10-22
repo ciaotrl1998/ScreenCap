@@ -37,7 +37,6 @@ namespace ScreenCap.UI
         private bool _initialized;
         private bool _ended;
         private bool _restarting;
-        private bool _pauseOnFirstFrame;
         private bool _closing;
         private long? _pendingSeekMs;
         private long _lastPlayerMs = -1;
@@ -134,8 +133,8 @@ namespace ScreenCap.UI
                     ShowPreviewError("无法预览该文件，但导出与复制仍然可用。")));
 
                 _media = new VlcMedia(_libVlc, _sourcePath, FromType.FromPath);
-                _pauseOnFirstFrame = true;
                 _player.Play(_media);
+                _player.SetPause(true);
                 _initialized = true;
             }
             catch (Exception ex)
@@ -175,12 +174,6 @@ namespace ScreenCap.UI
 
                 _restarting = false;
                 _ended = false;
-
-                if (_pauseOnFirstFrame)
-                {
-                    _pauseOnFirstFrame = false;
-                    _player.SetPause(true);
-                }
 
                 try
                 {
@@ -302,7 +295,6 @@ namespace ScreenCap.UI
             if (actualSeconds >= Timeline.OutPoint - 0.03)
             {
                 _player.SetPause(true);
-                _ended = true;
                 _lastPlayerMs = -1;
                 Timeline.Position = Timeline.OutPoint;
                 UpdateTimeText();
@@ -326,27 +318,27 @@ namespace ScreenCap.UI
                 return;
             }
 
+            if (_player.IsPlaying)
+            {
+                _player.Pause();
+                return;
+            }
+
             if (_restarting)
             {
                 return;
             }
 
-            if (_ended || Timeline.Position >= Timeline.OutPoint - 0.05)
+            if (_ended)
             {
-                _ended = false;
+                double start = Timeline.Position < Timeline.OutPoint - 0.05 ? Timeline.Position : Timeline.InPoint;
+                _ = RestartPlayerAsync(start);
+                return;
+            }
+
+            if (Timeline.Position >= Timeline.OutPoint - 0.1)
+            {
                 _ = RestartPlayerAsync(Timeline.InPoint);
-                return;
-            }
-
-            if (_player.State == VLCState.Paused)
-            {
-                _player.SetPause(false);
-                return;
-            }
-
-            if (_player.IsPlaying)
-            {
-                _player.Pause();
                 return;
             }
 
