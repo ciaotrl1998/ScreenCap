@@ -1,4 +1,4 @@
-# ScreenCap
+﻿# ScreenCap
 
 Windows 10/11 屏幕录制与 GIF 工具：
 
@@ -50,6 +50,8 @@ https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/version.json
 3. 临时 PowerShell 更新器等待进程退出，替换 `ScreenCap.exe` 并重新启动新版本。
 
 因此后续更新只需下载一个 exe，**不需要重新运行安装包**。安装版和便携版都适用（程序目录需可写）。
+
+> 注意：update\ScreenCap.exe 只是自动更新分发的程序本体，**不能单独双击运行**。它所在目录没有 Newtonsoft.Json.dll、libvlc、fmpeg 等运行依赖，直接运行会启动失败，并且因为单实例会占住 ScreenCap 进程。请运行安装版 %LOCALAPPDATA%\Programs\ScreenCap\ScreenCap.exe、开始菜单快捷方式或完整的便携目录。
 
 ### 发布新版本
 
