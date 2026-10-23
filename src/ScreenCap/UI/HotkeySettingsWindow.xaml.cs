@@ -11,6 +11,21 @@ namespace ScreenCap.UI
         private readonly Func<string, string> _apply;
         private readonly AppSettings _settings;
         private string _combo;
+        private bool _gifUpdating;
+
+        private static readonly (int Colors, bool Dither, int Width)[] GifPresets =
+        {
+            (32, false, 320),
+            (64, false, 480),
+            (64, true, 480),
+            (96, true, 640),
+            (128, true, 640),
+            (128, true, 800),
+            (192, true, 960),
+            (256, true, 960),
+            (256, true, 1280),
+            (256, true, 1920)
+        };
 
         public HotkeySettingsWindow(AppSettings settings, Func<string, string> apply)
         {
@@ -38,6 +53,79 @@ namespace ScreenCap.UI
             {
                 QualityText.Text = ((int)Math.Round(e.NewValue)).ToString();
             }
+        }
+
+        private void GifLevel_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_gifUpdating || GifColorsSlider == null)
+            {
+                return;
+            }
+
+            int level = (int)Math.Round(e.NewValue);
+            if (level < 1 || level > 10)
+            {
+                return;
+            }
+
+            var preset = GifPresets[level - 1];
+            _settings.GifQualityLevel = level;
+            _gifUpdating = true;
+            GifColorsSlider.Value = preset.Colors;
+            GifDitherCheck.IsChecked = preset.Dither;
+            GifWidthSlider.Value = preset.Width;
+            _gifUpdating = false;
+            UpdateGifQualityText();
+        }
+
+        private void GifColors_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (GifColorsText != null)
+            {
+                GifColorsText.Text = ((int)Math.Round(e.NewValue)).ToString();
+            }
+            MarkGifCustom();
+        }
+
+        private void GifWidth_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (GifWidthText != null)
+            {
+                GifWidthText.Text = ((int)Math.Round(e.NewValue)).ToString();
+            }
+            MarkGifCustom();
+        }
+
+        private void GifDither_Changed(object sender, RoutedEventArgs e)
+        {
+            MarkGifCustom();
+        }
+
+        private void MarkGifCustom()
+        {
+            if (_gifUpdating)
+            {
+                return;
+            }
+            _settings.GifQualityLevel = 0;
+            UpdateGifQualityText();
+        }
+
+        private void UpdateGifQualityText()
+        {
+            int level = (int)Math.Round(GifLevelSlider.Value);
+            int colors = (int)Math.Round(GifColorsSlider.Value);
+            bool dither = GifDitherCheck.IsChecked == true;
+            int width = (int)Math.Round(GifWidthSlider.Value);
+            GifLevelText.Text = _settings.GifQualityLevel == 0 ? "自定义" : level.ToString();
+            GifPresetHint.Text = colors + " 色 · " + (dither ? "抖动" : "无抖动") + " · " + width + " px";
+        }
+
+        private void GifExpand_Click(object sender, RoutedEventArgs e)
+        {
+            bool show = GifCustomPanel.Visibility != Visibility.Visible;
+            GifCustomPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            GifExpandButton.Content = show ? "▴" : "▾";
         }
 
         private void GifFps_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -178,6 +266,11 @@ namespace ScreenCap.UI
             {
                 _settings.Quality = (int)Math.Round(QualitySlider.Value);
                 _settings.GifFramerate = (int)Math.Round(GifFpsSlider.Value);
+                _settings.GifMaxColors = (int)Math.Round(GifColorsSlider.Value);
+                _settings.GifDither = GifDitherCheck.IsChecked == true;
+                _settings.GifMaxWidth = (int)Math.Round(GifWidthSlider.Value);
+                int level = (int)Math.Round(GifLevelSlider.Value);
+                _settings.GifQualityLevel = GifLevelText.Text == "自定义" ? 0 : level;
                 _settings.RecordSystemAudio = SoundCheck.IsChecked == true;
                 _settings.Save();
                 DialogResult = true;

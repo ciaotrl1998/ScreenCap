@@ -13,6 +13,10 @@ namespace ScreenCap.Core
         public bool RecordSystemAudio { get; set; } = true;
         public bool RecordGif { get; set; }
         public int GifFramerate { get; set; } = 15;
+        public int GifQualityLevel { get; set; } = 8;
+        public int GifMaxColors { get; set; } = 256;
+        public bool GifDither { get; set; } = true;
+        public int GifMaxWidth { get; set; } = 960;
         public string RecordingsFolder { get; set; } = "";
         public string ExportDirectory { get; set; } = "";
         public string FfmpegPath { get; set; } = "";
@@ -99,6 +103,9 @@ namespace ScreenCap.Core
             Framerate = Math.Max(15, Math.Min(120, Framerate));
             Quality = Math.Max(10, Math.Min(100, Quality));
             GifFramerate = Math.Max(5, Math.Min(30, GifFramerate));
+            GifQualityLevel = Math.Max(0, Math.Min(10, GifQualityLevel));
+            GifMaxColors = Math.Max(2, Math.Min(256, GifMaxColors));
+            GifMaxWidth = Math.Max(160, Math.Min(2560, GifMaxWidth));
             ExportDirectory = ExportDirectory?.Trim() ?? "";
         }
     }

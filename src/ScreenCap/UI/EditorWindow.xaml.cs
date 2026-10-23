@@ -95,7 +95,7 @@ namespace ScreenCap.UI
             Title = title;
             TitleText.Text = title;
             ExportButton.Content = _isGif ? "导出 GIF" : "导出";
-            ExportButton.ToolTip = _isGif ? "导出 GIF（15fps，最大宽度 960）" : "导出 MP4 视频";
+            ExportButton.ToolTip = _isGif ? ("导出 GIF：" + _settings.GifFramerate + "fps，" + _settings.GifMaxColors + " 色" + (_settings.GifDither ? "，抖动" : "，无抖动") + "，最大宽度 " + _settings.GifMaxWidth + "px") : "导出 MP4 视频";
             CopyButton.ToolTip = _isGif ? "将 GIF 作为文件复制到剪贴板" : "将剪辑后的 mp4 作为文件复制到剪贴板";
             StatusText.Text = _isGif
                 ? "GIF 模式：拖动时间轴裁剪，空格播放"
@@ -675,7 +675,7 @@ namespace ScreenCap.UI
                 var progress = new Progress<double>(SetBusyProgress);
                 if (gif)
                 {
-                    await FfmpegExporter.ExportGifAsync(ffmpeg, input, start, duration, output, _isGif ? _settings.GifFramerate : 15, progress, _exportCts.Token);
+                    await FfmpegExporter.ExportGifAsync(ffmpeg, input, start, duration, output, _isGif ? _settings.GifFramerate : 15, _settings.GifMaxColors, _settings.GifDither, _settings.GifMaxWidth, progress, _exportCts.Token);
                 }
                 else
                 {

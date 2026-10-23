@@ -90,11 +90,14 @@ namespace ScreenCap.Services
             double durationSeconds,
             string output,
             int framerate,
+            int maxColors,
+            bool dither,
+            int maxWidth,
             IProgress<double> progress,
             CancellationToken cancellationToken)
         {
             Prepare(ffmpegPath, input, output, ref startSeconds, ref durationSeconds);
-            string args = BuildGifArguments(input, startSeconds, durationSeconds, output, framerate);
+            string args = BuildGifArguments(input, startSeconds, durationSeconds, output, framerate, maxColors, dither, maxWidth);
             await RunAsync(ffmpegPath, args, output, durationSeconds, progress, cancellationToken);
         }
 
@@ -187,17 +190,19 @@ namespace ScreenCap.Services
                    "-y " + Quote(output);
         }
 
-        private static string BuildGifArguments(string input, double start, double duration, string output, int framerate)
+        private static string BuildGifArguments(string input, double start, double duration, string output, int framerate, int maxColors, bool dither, int maxWidth)
         {
             string ss = start.ToString("0.###", CultureInfo.InvariantCulture);
             string t = duration.ToString("0.###", CultureInfo.InvariantCulture);
             framerate = Math.Max(5, Math.Min(30, framerate));
+            maxColors = Math.Max(2, Math.Min(256, maxColors));
+            maxWidth = Math.Max(160, Math.Min(2560, maxWidth));
             string filter =
                 "fps=" + framerate + "," +
-                "scale=w='min(960,iw)':h=-1:flags=lanczos," +
+                "scale=w='min(" + maxWidth + ",iw)':h=-1:flags=lanczos," +
                 "split[s0][s1];" +
-                "[s0]palettegen=max_colors=256:stats_mode=full[p];" +
-                "[s1][p]paletteuse=dither=sierra2_4a";
+                "[s0]palettegen=max_colors=" + maxColors + ":stats_mode=full[p];" +
+                "[s1][p]paletteuse=dither=" + (dither ? "sierra2_4a" : "none");
 
             return "-hide_banner -loglevel error -nostats -progress pipe:1 " +
                    $"-ss {ss} -i {Quote(input)} -t {t} " +

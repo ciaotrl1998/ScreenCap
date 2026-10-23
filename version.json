@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.2.6",
+  "version": "1.2.7",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "d7e6f0ccdefcf7bc19b5440e2ac2d7b2e11ad69013c7099f2e11faa95f3dfa97",
-  "notes": "设置中新增 GIF 帧率（5-30fps），GIF 导出按该帧率生成。"
+  "sha256": "8c87170a12e78b8d25b652e1ddab8fa2a79348f3bcdaaa602213643b75a27186",
+  "notes": "设置中新增 GIF 质量主滑杆（10 档预设：颜色数/抖动/最大宽度），可展开细调，细调后显示自定义。"
 }
