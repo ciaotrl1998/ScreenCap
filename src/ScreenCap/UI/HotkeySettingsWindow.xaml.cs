@@ -103,7 +103,7 @@ namespace ScreenCap.UI
 
         private void MarkGifCustom()
         {
-            if (_gifUpdating)
+            if (_gifUpdating || _settings == null)
             {
                 return;
             }

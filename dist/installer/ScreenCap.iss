@@ -1,5 +1,5 @@
 ﻿#define MyAppName "ScreenCap"
-#define MyAppVersion "1.2.7"
+#define MyAppVersion "1.2.8"
 #define MyAppPublisher "ScreenCap"
 #define MyAppExeName "ScreenCap.exe"
 #define MySourceDir "D:\ScreenCap\dist\ScreenCap-portable"
@@ -28,8 +28,8 @@ LZMAUseSeparateProcess=yes
 WizardStyle=modern
 CloseApplications=yes
 AppMutex=Local\ScreenCap.SingleInstance
-VersionInfoVersion=1.2.7.0
-VersionInfoTextVersion=1.2.7
+VersionInfoVersion=1.2.8.0
+VersionInfoTextVersion=1.2.8
 VersionInfoDescription=ScreenCap 录屏与 GIF 工具
 VersionInfoProductName=ScreenCap
 VersionInfoCompany=ScreenCap

@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.2.7",
+  "version": "1.2.8",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "8c87170a12e78b8d25b652e1ddab8fa2a79348f3bcdaaa602213643b75a27186",
-  "notes": "设置中新增 GIF 质量主滑杆（10 档预设：颜色数/抖动/最大宽度），可展开细调，细调后显示自定义。"
+  "sha256": "3b76bfe066086fac4e50e4598bb1bd4db62c16ba80716169e473705150f8c676",
+  "notes": "修复设置窗口无法打开的问题（初始化时 GIF 细调控件事件过早访问未初始化的设置对象）。"
 }
