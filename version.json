@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.2.8",
+  "version": "1.2.9",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "3b76bfe066086fac4e50e4598bb1bd4db62c16ba80716169e473705150f8c676",
-  "notes": "修复设置窗口无法打开的问题（初始化时 GIF 细调控件事件过早访问未初始化的设置对象）。"
+  "sha256": "7cb9dd3c3bec7e5a3aa875643a030aec9720dfa677dc724cec18d14d91f9c6f2",
+  "notes": "修复 GIF 质量设置每次打开都显示默认 8 的问题：设置窗口现在会从 settings.json 加载档位、颜色数、抖动和最大宽度。"
 }

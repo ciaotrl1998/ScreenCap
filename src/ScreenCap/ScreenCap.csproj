@@ -12,9 +12,9 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>ScreenCap</AssemblyName>
     <RootNamespace>ScreenCap</RootNamespace>
-    <Version>1.2.8</Version>
-    <FileVersion>1.2.8.0</FileVersion>
-    <AssemblyVersion>1.2.8.0</AssemblyVersion>
+    <Version>1.2.9</Version>
+    <FileVersion>1.2.9.0</FileVersion>
+    <AssemblyVersion>1.2.9.0</AssemblyVersion>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

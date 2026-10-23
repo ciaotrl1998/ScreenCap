@@ -39,6 +39,16 @@ namespace ScreenCap.UI
             QualityText.Text = ((int)Math.Round(QualitySlider.Value)).ToString();
             GifFpsText.Text = ((int)Math.Round(GifFpsSlider.Value)).ToString();
             SoundCheck.IsChecked = settings.RecordSystemAudio;
+
+            _gifUpdating = true;
+            int level = settings.GifQualityLevel;
+            GifLevelSlider.Value = level >= 1 && level <= 10 ? level : 8;
+            GifColorsSlider.Value = Math.Max(2, Math.Min(256, settings.GifMaxColors));
+            GifDitherCheck.IsChecked = settings.GifDither;
+            GifWidthSlider.Value = Math.Max(160, Math.Min(2560, settings.GifMaxWidth));
+            _gifUpdating = false;
+            UpdateGifQualityText();
+
             PreviewKeyDown += OnPreviewKeyDown;
             Loaded += (s, e) =>
             {
