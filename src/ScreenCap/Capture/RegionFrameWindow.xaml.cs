@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -154,7 +155,47 @@ namespace ScreenCap.Capture
             Canvas.SetTop(Shade, localY - MarginDip);
             Shade.Width = width + MarginDip * 2;
             Shade.Height = height + MarginDip * 2;
+
+            ApplyWindowRegion(hwnd);
         }
+
+        private void ApplyWindowRegion(IntPtr hwnd)
+        {
+            int band = (int)Math.Ceiling(HitDip * _scale);
+            int left = _region.X - _monitor.Bounds.X;
+            int top = _region.Y - _monitor.Bounds.Y;
+
+            IntPtr outer = CreateRectRgn(
+                left - band,
+                top - band,
+                left + _region.Width + band,
+                top + _region.Height + band);
+            IntPtr inner = CreateRectRgn(
+                left + band,
+                top + band,
+                left + _region.Width - band,
+                top + _region.Height - band);
+
+            CombineRgn(outer, outer, inner, RGN_DIFF);
+            SetWindowRgn(hwnd, outer, true);
+
+            DeleteObject(outer);
+            DeleteObject(inner);
+        }
+
+        [DllImport("gdi32.dll")]
+        private static extern IntPtr CreateRectRgn(int left, int top, int right, int bottom);
+
+        [DllImport("gdi32.dll")]
+        private static extern int CombineRgn(IntPtr dest, IntPtr src1, IntPtr src2, int mode);
+
+        [DllImport("gdi32.dll")]
+        private static extern bool DeleteObject(IntPtr hObject);
+
+        [DllImport("user32.dll")]
+        private static extern int SetWindowRgn(IntPtr hWnd, IntPtr hRgn, bool redraw);
+
+        private const int RGN_DIFF = 4;
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
