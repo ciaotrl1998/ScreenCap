@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.2.9",
+  "version": "1.2.10",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "7cb9dd3c3bec7e5a3aa875643a030aec9720dfa677dc724cec18d14d91f9c6f2",
-  "notes": "修复 GIF 质量设置每次打开都显示默认 8 的问题：设置窗口现在会从 settings.json 加载档位、颜色数、抖动和最大宽度。"
+  "sha256": "01f02641adae4287ae96c7432644f2f9e1150847c2b9822481a0105550e6c375",
+  "notes": "框选完成、开始录制前，框内区域可以正常点击操作底层窗口；边框仍可拖动调整。"
 }

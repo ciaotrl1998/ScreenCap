@@ -175,7 +175,7 @@ namespace ScreenCap.Capture
             int y = (short)((packed >> 16) & 0xFFFF);
             var screen = new System.Drawing.Point(x, y);
 
-            if (GetEdge(screen) != Edge.None || _region.Contains(screen))
+            if (GetEdge(screen) != Edge.None)
             {
                 return new IntPtr(HTCLIENT);
             }
