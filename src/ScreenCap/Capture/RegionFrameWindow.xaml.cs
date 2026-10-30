@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using ScreenCap.Core;
 
 namespace ScreenCap.Capture
@@ -27,6 +28,7 @@ namespace ScreenCap.Capture
         private bool _resizing;
         private bool _windowPositioned;
         private HwndSource _source;
+        private DispatcherTimer _topmostTimer;
         private Edge _edge;
         private System.Windows.Point _dragStartScreen;
         private Rectangle _dragStartRegion;
@@ -66,6 +68,7 @@ namespace ScreenCap.Capture
             };
             Closed += (s, e) =>
             {
+                _topmostTimer?.Stop();
                 if (_source != null)
                 {
                     _source.RemoveHook(WndProc);
@@ -91,6 +94,13 @@ namespace ScreenCap.Capture
             Show();
             ApplyGeometry();
             Opacity = 1;
+
+            if (_topmostTimer == null)
+            {
+                _topmostTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(600) };
+                _topmostTimer.Tick += (s, e) => BringToTop();
+            }
+            _topmostTimer.Start();
         }
 
         public void UpdateRegion(Rectangle region)
@@ -157,6 +167,22 @@ namespace ScreenCap.Capture
             Shade.Height = height + MarginDip * 2;
 
             ApplyWindowRegion(hwnd);
+        }
+
+        private void BringToTop()
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            if (hwnd == IntPtr.Zero || _monitor == null)
+            {
+                return;
+            }
+
+            Native.SetWindowRect(
+                hwnd,
+                _monitor.Bounds.X,
+                _monitor.Bounds.Y,
+                _monitor.Bounds.Width,
+                _monitor.Bounds.Height);
         }
 
         private void ApplyWindowRegion(IntPtr hwnd)

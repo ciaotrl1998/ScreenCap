@@ -1,6 +1,6 @@
 ﻿{
-  "version": "1.2.11",
+  "version": "1.2.12",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "e88186fa2d5a30c232827ee2f8ca053a58860fabea46f74c6a7d7737628952da",
-  "notes": "改用窗口区域挖空框内区域，开始录制前框内可正常操作底层窗口，边框仍可拖动调整。"
+  "sha256": "12cd3d904bb1bff391f9e8e269edbe321ccde73befb2abbc4b41dfea36131fea",
+  "notes": "录屏边框每 600ms 重新置顶，避免被其他应用层级压到下面。"
 }
