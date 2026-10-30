@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -47,7 +47,7 @@ namespace ScreenCap
             Log.Info("启动时清理缓存");
             CacheManager.Cleanup(_settings.CacheFolder);
 
-            _controller = new CaptureController(_settings);
+            _controller = new CaptureController(_settings, ApplyHotkey);
             _tray = new TrayIcon(
                 () => Dispatcher.BeginInvoke(new Action(() => _controller.Toggle())),
                 () => Dispatcher.BeginInvoke(new Action(() => CheckForUpdates(true))),
@@ -205,7 +205,7 @@ namespace ScreenCap
                     string path = args[i + 1];
                     if (File.Exists(path))
                     {
-                        new EditorWindow(path, TimeSpan.FromSeconds(10), _settings, false).Show();
+                        new EditorWindow(path, TimeSpan.FromSeconds(10), _settings, false, ApplyHotkey).Show();
                     }
                     return;
                 }

@@ -82,6 +82,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Button x:Name="PlayButton"
@@ -112,8 +113,20 @@
                            HorizontalAlignment="Right"
                            Margin="16,0,16,0" />
 
-                <Button x:Name="OpenFolderButton"
+                <Button x:Name="SettingsButton"
                         Grid.Column="3"
+                        Content="⚙"
+                        Style="{StaticResource GhostButton}"
+                        Width="38"
+                        Height="38"
+                        Padding="0"
+                        FontSize="15"
+                        ToolTip="设置"
+                        Margin="0,0,8,0"
+                        Click="Settings_Click" />
+
+                <Button x:Name="OpenFolderButton"
+                        Grid.Column="4"
                         Content="打开文件夹"
                         Style="{StaticResource GhostButton}"
                         Visibility="Collapsed"
@@ -121,7 +134,7 @@
                         Click="OpenFolder_Click" />
 
                 <Button x:Name="ExportButton"
-                        Grid.Column="4"
+                        Grid.Column="5"
                         Content="导出"
                         Style="{StaticResource RosePrimaryButton}"
                         MinWidth="96"
@@ -129,7 +142,7 @@
                         Click="Export_Click" />
 
                 <Button x:Name="CopyButton"
-                        Grid.Column="5"
+                        Grid.Column="6"
                         Content="复制到剪贴板"
                         Style="{StaticResource RosePrimaryButton}"
                         MinWidth="128"

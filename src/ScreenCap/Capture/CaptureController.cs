@@ -21,6 +21,7 @@ namespace ScreenCap.Capture
         }
 
         private readonly AppSettings _settings;
+        private readonly Func<string, string> _applyHotkey;
         private State _state = State.Idle;
         private RegionSelector _selector;
         private ControlBarWindow _bar;
@@ -33,9 +34,10 @@ namespace ScreenCap.Capture
         public bool IsBusy => _state != State.Idle;
         public bool IsRecording => _state == State.Recording;
 
-        public CaptureController(AppSettings settings)
+        public CaptureController(AppSettings settings, Func<string, string> applyHotkey = null)
         {
             _settings = settings;
+            _applyHotkey = applyHotkey;
         }
 
         public async void Toggle()
@@ -223,7 +225,7 @@ namespace ScreenCap.Capture
 
             if (!string.IsNullOrEmpty(path) && File.Exists(path) && new FileInfo(path).Length > 1024)
             {
-                new EditorWindow(path, elapsed, _settings, _recordGif).Show();
+                new EditorWindow(path, elapsed, _settings, _recordGif, _applyHotkey).Show();
             }
             else
             {

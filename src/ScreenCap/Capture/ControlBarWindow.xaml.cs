@@ -17,6 +17,7 @@ namespace ScreenCap.Capture
         private static readonly Brush InactiveTextBrush = CreateBrush(Color.FromRgb(0xB9, 0xBB, 0xC4));
 
         private readonly DispatcherTimer _timer;
+        private readonly DispatcherTimer _topmostTimer;
         private readonly Stopwatch _stopwatch = new Stopwatch();
         private System.Drawing.Rectangle _region;
         private MonitorInfo _monitor;
@@ -45,11 +46,18 @@ namespace ScreenCap.Capture
             };
             _timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
             _timer.Tick += (s, e) => TimerText.Text = _stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
-            Closed += (s, e) => _timer.Stop();
+            _topmostTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(600) };
+            _topmostTimer.Tick += (s, e) => BringToTop();
+            Closed += (s, e) =>
+            {
+                _timer.Stop();
+                _topmostTimer.Stop();
+            };
         }
 
         public void ShowReady(System.Drawing.Rectangle region, MonitorInfo monitor, bool isGif)
         {
+            _topmostTimer.Start();
             _region = region;
             _monitor = monitor;
             _avoidRegion = false;
@@ -72,6 +80,7 @@ namespace ScreenCap.Capture
 
         public void ShowRecording()
         {
+            _topmostTimer.Start();
             _avoidRegion = true;
             ReadyPanel.Visibility = Visibility.Collapsed;
             RecordingPanel.Visibility = Visibility.Visible;
@@ -130,6 +139,17 @@ namespace ScreenCap.Capture
             VideoButton.Foreground = isGif ? InactiveTextBrush : ActiveTextBrush;
             GifButton.ToolTip = "录制为 GIF 动图（导出时按 15fps、最大宽度 960 生成）";
             VideoButton.ToolTip = "录制为 MP4 视频";
+        }
+
+        private void BringToTop()
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            if (hwnd == IntPtr.Zero)
+            {
+                return;
+            }
+            var rect = Native.GetWindowRectangle(hwnd);
+            Native.PositionWindow(hwnd, rect.Left, rect.Top);
         }
 
         private void Place()

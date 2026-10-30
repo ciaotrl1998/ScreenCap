@@ -207,13 +207,19 @@ namespace ScreenCap.UI
             {
                 case DragMode.In:
                     _inPoint = Math.Max(0, Math.Min(XToTime(p.X), _outPoint - MinGap));
-                    _position = _inPoint;
+                    if (_position < _inPoint)
+                    {
+                        _position = _inPoint;
+                    }
                     InvalidateVisual();
                     RangeChanged?.Invoke();
                     break;
                 case DragMode.Out:
                     _outPoint = Math.Min(_duration, Math.Max(XToTime(p.X), _inPoint + MinGap));
-                    _position = _outPoint;
+                    if (_position > _outPoint)
+                    {
+                        _position = _outPoint;
+                    }
                     InvalidateVisual();
                     RangeChanged?.Invoke();
                     break;
@@ -238,14 +244,7 @@ namespace ScreenCap.UI
             ReleaseMouseCapture();
             e.Handled = true;
 
-            if (mode == DragMode.In)
-            {
-                SeekRequested?.Invoke(_inPoint);
-            }
-            else if (mode == DragMode.Out)
-            {
-                SeekRequested?.Invoke(_outPoint);
-            }
+            // 拖动入/出点时不移动当前帧，除非当前帧被区间挤出。
         }
 
         private void SetPlayheadFromX(double x)

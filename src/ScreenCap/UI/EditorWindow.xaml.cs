@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -21,6 +21,7 @@ namespace ScreenCap.UI
         private readonly string _sourcePath;
         private readonly string _baseName;
         private readonly AppSettings _settings;
+        private readonly Func<string, string> _applyHotkey;
         private readonly bool _isGif;
         private readonly DispatcherTimer _positionTimer;
 
@@ -43,11 +44,12 @@ namespace ScreenCap.UI
         private long _lastPlayerTimestamp;
         private double _interpolatedSeconds;
 
-        public EditorWindow(string sourcePath, TimeSpan fallbackDuration, AppSettings settings, bool isGif)
+        public EditorWindow(string sourcePath, TimeSpan fallbackDuration, AppSettings settings, bool isGif, Func<string, string> applyHotkey = null)
         {
             _sourcePath = sourcePath;
             _settings = settings;
             _isGif = isGif;
+            _applyHotkey = applyHotkey;
 
             DateTime stamp = DateTime.Now;
             try
@@ -436,6 +438,19 @@ namespace ScreenCap.UI
                 }
             }
             UpdateTimeText();
+        }
+
+        private void Settings_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var window = new HotkeySettingsWindow(_settings, _applyHotkey ?? (t => null)) { Owner = this };
+                window.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                Log.Error("打开设置失败", ex);
+            }
         }
 
         private void Play_Click(object sender, RoutedEventArgs e)
