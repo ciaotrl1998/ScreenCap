@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,11 +75,14 @@ namespace ScreenCap.Services
             double durationSeconds,
             string output,
             IProgress<double> progress,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken,
+            bool fullRange = false,
+            int? quality = null,
+            bool removeAudio = false)
         {
-            Prepare(ffmpegPath, input, output, ref startSeconds, ref durationSeconds);
-            string args = BuildVideoArguments(input, startSeconds, durationSeconds, output);
-            await RunAsync(ffmpegPath, args, output, durationSeconds, progress, cancellationToken);
+            string temporary = Prepare(ffmpegPath, input, output, ref startSeconds, ref durationSeconds);
+            string args = BuildVideoArguments(input, startSeconds, fullRange ? (double?)null : durationSeconds, temporary, quality, removeAudio);
+            await PublishAsync(ffmpegPath, args, temporary, output, durationSeconds, progress, cancellationToken);
         }
 
         public static async Task ExportGifAsync(
@@ -96,12 +98,12 @@ namespace ScreenCap.Services
             IProgress<double> progress,
             CancellationToken cancellationToken)
         {
-            Prepare(ffmpegPath, input, output, ref startSeconds, ref durationSeconds);
-            string args = BuildGifArguments(input, startSeconds, durationSeconds, output, framerate, maxColors, dither, maxWidth);
-            await RunAsync(ffmpegPath, args, output, durationSeconds, progress, cancellationToken);
+            string temporary = Prepare(ffmpegPath, input, output, ref startSeconds, ref durationSeconds);
+            string args = BuildGifArguments(input, startSeconds, durationSeconds, temporary, framerate, maxColors, dither, maxWidth);
+            await PublishAsync(ffmpegPath, args, temporary, output, durationSeconds, progress, cancellationToken);
         }
 
-        private static void Prepare(string ffmpegPath, string input, string output, ref double startSeconds, ref double durationSeconds)
+        private static string Prepare(string ffmpegPath, string input, string output, ref double startSeconds, ref double durationSeconds)
         {
             if (string.IsNullOrWhiteSpace(ffmpegPath) || !File.Exists(ffmpegPath))
             {
@@ -114,12 +116,33 @@ namespace ScreenCap.Services
             if (startSeconds < 0) startSeconds = 0;
             if (durationSeconds <= 0.02) durationSeconds = 0.02;
 
-            string directory = Path.GetDirectoryName(output);
-            if (!string.IsNullOrEmpty(directory))
+            string directory = Path.GetDirectoryName(Path.GetFullPath(output));
+            Directory.CreateDirectory(directory);
+            return Path.Combine(directory, ".screencap-" + Guid.NewGuid().ToString("N") + Path.GetExtension(output));
+        }
+
+        private static async Task PublishAsync(string ffmpegPath, string args, string temporary, string output,
+            double durationSeconds, IProgress<double> progress, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
             {
-                Directory.CreateDirectory(directory);
+                await RunAsync(ffmpegPath, args, temporary, durationSeconds, progress, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (File.Exists(output))
+                {
+                    File.Replace(temporary, output, null);
+                }
+                else
+                {
+                    File.Move(temporary, output);
+                }
+                progress?.Report(1.0);
             }
-            TryDelete(output);
+            finally
+            {
+                TryDelete(temporary);
+            }
         }
 
         private static async Task RunAsync(
@@ -162,32 +185,40 @@ namespace ScreenCap.Services
 
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        TryDelete(output);
                         throw new OperationCanceledException(cancellationToken);
                     }
 
                     if (process.ExitCode != 0)
                     {
-                        TryDelete(output);
                         throw new InvalidOperationException("ffmpeg 导出失败：" + Environment.NewLine + (string.IsNullOrWhiteSpace(error) ? "未知错误" : error.Trim()));
                     }
 
-                    progress?.Report(1.0);
                 }
             }
         }
 
-        private static string BuildVideoArguments(string input, double start, double duration, string output)
+        private static string BuildVideoArguments(string input, double start, double? duration, string output, int? quality, bool removeAudio)
         {
-            string ss = start.ToString("0.###", CultureInfo.InvariantCulture);
-            string t = duration.ToString("0.###", CultureInfo.InvariantCulture);
+            string source = "-i " + Quote(input) + " ";
+            if (duration.HasValue)
+            {
+                string ss = start.ToString("0.###", CultureInfo.InvariantCulture);
+                string t = duration.Value.ToString("0.###", CultureInfo.InvariantCulture);
+                source = $"-ss {ss} {source}-t {t} ";
+            }
+
+            // x264 uses increasing CRF values for stronger compression.
+            int qualityLevel = Math.Max(10, Math.Min(100, quality ?? 100));
+            int crf = 20 + (int)Math.Round((100 - qualityLevel) * 22.0 / 90.0);
+            string video = duration.HasValue || quality.HasValue
+                ? $"-c:v libx264 -preset veryfast -crf {crf} -pix_fmt yuv420p " +
+                  "-color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 "
+                : "-c:v copy ";
+            string audio = removeAudio ? "-an " : duration.HasValue
+                ? "-map 0:a:0? -c:a aac -b:a 192k "
+                : "-map 0:a:0? -c:a copy ";
             return "-hide_banner -loglevel error -nostats -progress pipe:1 " +
-                   $"-ss {ss} -i {Quote(input)} -t {t} " +
-                   "-map 0:v:0 -map 0:a:0? " +
-                   "-c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p " +
-                   "-color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 " +
-                   "-c:a aac -b:a 192k -movflags +faststart " +
-                   "-y " + Quote(output);
+                   source + "-map 0:v:0 " + video + audio + "-movflags +faststart -y " + Quote(output);
         }
 
         private static string BuildGifArguments(string input, double start, double duration, string output, int framerate, int maxColors, bool dither, int maxWidth)

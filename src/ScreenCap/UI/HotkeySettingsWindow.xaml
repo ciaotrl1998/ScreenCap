@@ -61,37 +61,45 @@
                            Visibility="Collapsed"
                            Margin="0,8,0,0" />
 
-                <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
-
-                <TextBlock Text="画质" Foreground="#B9BBC4" FontSize="12" />
-                <Grid Margin="0,4,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Slider x:Name="QualitySlider"
-                            Minimum="10"
-                            Maximum="100"
-                            TickFrequency="5"
-                            IsSnapToTickEnabled="True"
-                            Value="75"
-                            VerticalAlignment="Center"
-                            ValueChanged="Quality_ValueChanged" />
-                    <TextBlock x:Name="QualityText"
-                               Grid.Column="1"
-                               Text="75"
-                               Foreground="#E8E9EE"
-                               FontFamily="Consolas"
-                               FontSize="13"
-                               Width="34"
-                               TextAlignment="Right"
-                               VerticalAlignment="Center"
-                               Margin="12,0,0,0" />
-                </Grid>
-                <TextBlock Text="数值越高画质越好、文件越大"
-                           Foreground="{StaticResource DimTextBrush}"
-                           FontSize="12"
-                           Margin="0,4,0,0" />
+                <StackPanel x:Name="VideoQualityPanel">
+                    <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
+                    <TextBlock x:Name="QualityLabel" Text="画质" Foreground="#B9BBC4" FontSize="12" />
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition x:Name="QualityAvailableColumn" Width="*" />
+                                <ColumnDefinition x:Name="QualityUnavailableColumn" Width="0" />
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="QualityUnavailableTrack" Grid.Column="1"
+                                    Height="4" VerticalAlignment="Center" Margin="-6,0,5,0"
+                                    Background="#5D606B" IsHitTestVisible="False" Visibility="Collapsed" />
+                            <Slider x:Name="QualitySlider"
+                                    Minimum="10"
+                                    Maximum="100"
+                                    TickFrequency="5"
+                                    IsSnapToTickEnabled="True"
+                                    Value="75"
+                                    VerticalAlignment="Center"
+                                    ValueChanged="Quality_ValueChanged" />
+                        </Grid>
+                        <TextBlock x:Name="QualityText"
+                                   Grid.Column="1"
+                                   Text="75"
+                                   Foreground="#E8E9EE"
+                                   FontFamily="Consolas"
+                                   FontSize="13"
+                                   Width="34"
+                                   TextAlignment="Right"
+                                   VerticalAlignment="Center"
+                                   Margin="12,0,0,0" />
+                    </Grid>
+                    <TextBlock x:Name="QualityHint" Text="数值越高画质越好、文件越大"
+                               Foreground="{StaticResource DimTextBrush}" FontSize="12" Margin="0,4,0,0" />
+                </StackPanel>
 
                 <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
 
@@ -234,19 +242,18 @@
                            FontSize="12"
                            Margin="0,4,0,0" />
 
-                <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
-
-                <TextBlock Text="录制声音" Foreground="#B9BBC4" FontSize="12" />
-                <CheckBox x:Name="SoundCheck"
-                          Content="录制系统声音（扬声器 / 耳机）"
-                          Foreground="#E8E9EE"
-                          FontSize="13"
-                          IsChecked="True"
-                          Margin="0,8,0,0" />
-                <TextBlock Text="关闭后只录画面，不录系统声音"
-                           Foreground="{StaticResource DimTextBrush}"
-                           FontSize="12"
-                           Margin="0,6,0,0" />
+                <StackPanel x:Name="VideoSoundPanel">
+                    <Border Height="1" Background="{StaticResource StrokeBrush}" Margin="0,16,0,14" />
+                    <TextBlock x:Name="SoundLabel" Text="录制声音" Foreground="#B9BBC4" FontSize="12" />
+                    <CheckBox x:Name="SoundCheck"
+                              Content="录制系统声音（扬声器 / 耳机）"
+                              Foreground="#E8E9EE"
+                              FontSize="13"
+                              IsChecked="True"
+                              Margin="0,8,0,0" />
+                    <TextBlock x:Name="SoundHint" Text="关闭后只录画面，不录系统声音"
+                               Foreground="{StaticResource DimTextBrush}" FontSize="12" Margin="0,6,0,0" />
+                </StackPanel>
             </StackPanel>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="24,16">

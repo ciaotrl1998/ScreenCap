@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Input;
+using System.Windows.Media;
 using ScreenCap.Core;
 
 namespace ScreenCap.UI
@@ -11,7 +13,9 @@ namespace ScreenCap.UI
         private readonly Func<string, string> _apply;
         private readonly AppSettings _settings;
         private string _combo;
+        private bool _editingRecording;
         private bool _gifUpdating;
+        private int _gifQualityLevel;
 
         private static readonly (int Colors, bool Dither, int Width)[] GifPresets =
         {
@@ -41,8 +45,8 @@ namespace ScreenCap.UI
             SoundCheck.IsChecked = settings.RecordSystemAudio;
 
             _gifUpdating = true;
-            int level = settings.GifQualityLevel;
-            GifLevelSlider.Value = level >= 1 && level <= 10 ? level : 8;
+            _gifQualityLevel = settings.GifQualityLevel;
+            GifLevelSlider.Value = _gifQualityLevel >= 1 && _gifQualityLevel <= 10 ? _gifQualityLevel : 8;
             GifColorsSlider.Value = Math.Max(2, Math.Min(256, settings.GifMaxColors));
             GifDitherCheck.IsChecked = settings.GifDither;
             GifWidthSlider.Value = Math.Max(160, Math.Min(2560, settings.GifMaxWidth));
@@ -55,6 +59,57 @@ namespace ScreenCap.UI
                 Activate();
                 Keyboard.Focus(CaptureBox);
             };
+        }
+
+        internal int VideoQuality => (int)Math.Round(QualitySlider.Value);
+        internal bool IncludeSound => SoundCheck.IsEnabled && SoundCheck.IsChecked == true;
+
+        internal void ConfigureForRecording(int? recordedQuality, int? exportQuality, bool? sourceHasAudio, bool includeSound, bool isGif)
+        {
+            _editingRecording = true;
+            if (isGif)
+            {
+                VideoQualityPanel.Visibility = Visibility.Collapsed;
+                VideoSoundPanel.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            QualityLabel.Text = "导出画质";
+            AutomationProperties.SetName(QualitySlider, QualityLabel.Text);
+            if (recordedQuality.HasValue)
+            {
+                int limit = recordedQuality.Value;
+                double minimum = QualitySlider.Minimum;
+                double maximum = QualitySlider.Maximum;
+                if (limit < maximum)
+                {
+                    QualityAvailableColumn.Width = new GridLength(limit - minimum, GridUnitType.Star);
+                    QualityAvailableColumn.MinWidth = 14;
+                    QualityUnavailableColumn.Width = new GridLength(maximum - limit, GridUnitType.Star);
+                    QualityUnavailableTrack.Visibility = Visibility.Visible;
+                }
+                QualitySlider.Maximum = limit;
+                QualitySlider.IsEnabled = limit > minimum;
+                QualitySlider.Value = exportQuality ?? limit;
+                QualityHint.Text = $"录制画质为 {limit}，降低画质仅应用于本段视频的导出";
+            }
+            else
+            {
+                QualitySlider.IsEnabled = false;
+                QualityText.Text = "—";
+                QualityHint.Text = "这段视频没有保存录制画质设置";
+            }
+
+            SoundLabel.Text = "导出声音";
+            SoundCheck.Content = "保留录制的系统声音";
+            SoundCheck.IsEnabled = sourceHasAudio == true;
+            SoundCheck.IsChecked = SoundCheck.IsEnabled && includeSound;
+            if (!SoundCheck.IsEnabled)
+            {
+                SoundCheck.Foreground = (Brush)FindResource("DimTextBrush");
+            }
+            SoundHint.Text = sourceHasAudio == true ? "关闭后导出的视频将静音" :
+                sourceHasAudio == false ? "这段视频未录制系统声音" : "尚未读取这段视频的音轨信息";
         }
 
         private void Quality_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -79,7 +134,7 @@ namespace ScreenCap.UI
             }
 
             var preset = GifPresets[level - 1];
-            _settings.GifQualityLevel = level;
+            _gifQualityLevel = level;
             _gifUpdating = true;
             GifColorsSlider.Value = preset.Colors;
             GifDitherCheck.IsChecked = preset.Dither;
@@ -117,7 +172,7 @@ namespace ScreenCap.UI
             {
                 return;
             }
-            _settings.GifQualityLevel = 0;
+            _gifQualityLevel = 0;
             UpdateGifQualityText();
         }
 
@@ -127,7 +182,7 @@ namespace ScreenCap.UI
             int colors = (int)Math.Round(GifColorsSlider.Value);
             bool dither = GifDitherCheck.IsChecked == true;
             int width = (int)Math.Round(GifWidthSlider.Value);
-            GifLevelText.Text = _settings.GifQualityLevel == 0 ? "自定义" : level.ToString();
+            GifLevelText.Text = _gifQualityLevel == 0 ? "自定义" : level.ToString();
             GifPresetHint.Text = colors + " 色 · " + (dither ? "抖动" : "无抖动") + " · " + width + " px";
         }
 
@@ -148,13 +203,18 @@ namespace ScreenCap.UI
 
         private void OnPreviewKeyDown(object sender, KeyEventArgs e)
         {
-            e.Handled = true;
-
             if (e.Key == Key.Escape)
             {
+                e.Handled = true;
                 Close();
                 return;
             }
+            if (!CaptureBox.IsKeyboardFocusWithin ||
+                (e.Key == Key.Tab && (Keyboard.Modifiers & ~ModifierKeys.Shift) == ModifierKeys.None))
+            {
+                return;
+            }
+            e.Handled = true;
 
             Key key = e.Key == Key.System ? e.SystemKey : e.Key;
             if (IsModifier(key))
@@ -271,17 +331,19 @@ namespace ScreenCap.UI
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            string error = _apply(_combo);
+            string error = _combo == _settings.Hotkey ? null : _apply(_combo);
             if (error == null)
             {
-                _settings.Quality = (int)Math.Round(QualitySlider.Value);
+                if (!_editingRecording)
+                {
+                    _settings.Quality = VideoQuality;
+                    _settings.RecordSystemAudio = IncludeSound;
+                }
                 _settings.GifFramerate = (int)Math.Round(GifFpsSlider.Value);
                 _settings.GifMaxColors = (int)Math.Round(GifColorsSlider.Value);
                 _settings.GifDither = GifDitherCheck.IsChecked == true;
                 _settings.GifMaxWidth = (int)Math.Round(GifWidthSlider.Value);
-                int level = (int)Math.Round(GifLevelSlider.Value);
-                _settings.GifQualityLevel = GifLevelText.Text == "自定义" ? 0 : level;
-                _settings.RecordSystemAudio = SoundCheck.IsChecked == true;
+                _settings.GifQualityLevel = _gifQualityLevel;
                 _settings.Save();
                 DialogResult = true;
                 Close();

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +24,7 @@ namespace ScreenCap.UI
         private readonly AppSettings _settings;
         private readonly Func<string, string> _applyHotkey;
         private readonly bool _isGif;
+        private readonly RecordingProfile _recording;
         private readonly DispatcherTimer _positionTimer;
 
         private LibVLC _libVlc;
@@ -43,13 +45,23 @@ namespace ScreenCap.UI
         private long _lastPlayerMs = -1;
         private long _lastPlayerTimestamp;
         private double _interpolatedSeconds;
+        private int? _exportQuality;
+        private bool _removeAudio;
 
         public EditorWindow(string sourcePath, TimeSpan fallbackDuration, AppSettings settings, bool isGif, Func<string, string> applyHotkey = null)
+            : this(sourcePath, fallbackDuration, settings, isGif, applyHotkey, null)
+        {
+        }
+
+        internal EditorWindow(string sourcePath, TimeSpan fallbackDuration, AppSettings settings, bool isGif,
+            Func<string, string> applyHotkey, RecordingProfile recording)
         {
             _sourcePath = sourcePath;
             _settings = settings;
             _isGif = isGif;
             _applyHotkey = applyHotkey;
+            _recording = recording ?? RecordingProfile.Load(sourcePath);
+            _exportQuality = _recording?.Quality;
 
             DateTime stamp = DateTime.Now;
             try
@@ -97,11 +109,16 @@ namespace ScreenCap.UI
             Title = title;
             TitleText.Text = title;
             ExportButton.Content = _isGif ? "导出 GIF" : "导出";
-            ExportButton.ToolTip = _isGif ? ("导出 GIF：" + _settings.GifFramerate + "fps，" + _settings.GifMaxColors + " 色" + (_settings.GifDither ? "，抖动" : "，无抖动") + "，最大宽度 " + _settings.GifMaxWidth + "px") : "导出 MP4 视频";
+            UpdateExportTooltip();
             CopyButton.ToolTip = _isGif ? "将 GIF 作为文件复制到剪贴板" : "将剪辑后的 mp4 作为文件复制到剪贴板";
             StatusText.Text = _isGif
                 ? "GIF 模式：拖动时间轴裁剪，空格播放"
                 : "拖动时间轴两端滑块裁剪，空格播放";
+        }
+
+        private void UpdateExportTooltip()
+        {
+            ExportButton.ToolTip = _isGif ? ("导出 GIF：" + _settings.GifFramerate + "fps，" + _settings.GifMaxColors + " 色" + (_settings.GifDither ? "，抖动" : "，无抖动") + "，最大宽度 " + _settings.GifMaxWidth + "px") : "导出 MP4 视频";
         }
 
         private void FitToScreen()
@@ -442,10 +459,34 @@ namespace ScreenCap.UI
 
         private void Settings_Click(object sender, RoutedEventArgs e)
         {
+            if (IsBusy)
+            {
+                return;
+            }
+
             try
             {
+                bool? sourceHasAudio = _recording?.SystemAudio;
+                if (!_isGif && !sourceHasAudio.HasValue)
+                {
+                    var tracks = _media?.Tracks;
+                    if (tracks != null && tracks.Length > 0)
+                    {
+                        sourceHasAudio = tracks.Any(track => track.TrackType == TrackType.Audio);
+                    }
+                }
+
                 var window = new HotkeySettingsWindow(_settings, _applyHotkey ?? (t => null)) { Owner = this };
-                window.ShowDialog();
+                window.ConfigureForRecording(_recording?.Quality, _exportQuality, sourceHasAudio, !_removeAudio, _isGif);
+                if (window.ShowDialog() == true)
+                {
+                    if (!_isGif)
+                    {
+                        _exportQuality = _recording != null ? window.VideoQuality : (int?)null;
+                        _removeAudio = sourceHasAudio == true && !window.IncludeSound;
+                    }
+                    UpdateExportTooltip();
+                }
             }
             catch (Exception ex)
             {
@@ -535,8 +576,10 @@ namespace ScreenCap.UI
 
         private bool IsBusy => _exportCts != null;
 
-        private bool CanExportOriginal => !_isGif && (!_userAdjustedRange ||
-            (Timeline.InPoint == 0 && Timeline.OutPoint == Timeline.Duration));
+        private bool HasFullRange => !_userAdjustedRange ||
+            (Timeline.InPoint == 0 && Timeline.OutPoint == Timeline.Duration);
+
+        private bool CanExportOriginal => !_isGif && HasFullRange && !_removeAudio && _exportQuality == _recording?.Quality;
 
         private async void Export_Click(object sender, RoutedEventArgs e)
         {
@@ -618,7 +661,7 @@ namespace ScreenCap.UI
             {
                 return true;
             }
-            if (!ValidateRange())
+            if ((_isGif || !HasFullRange) && !ValidateRange())
             {
                 return false;
             }
@@ -682,7 +725,9 @@ namespace ScreenCap.UI
                 }
                 else
                 {
-                    await FfmpegExporter.ExportAsync(ffmpeg, input, start, duration, output, progress, _exportCts.Token);
+                    int? quality = _exportQuality == _recording?.Quality ? null : _exportQuality;
+                    await FfmpegExporter.ExportAsync(ffmpeg, input, start, duration, output, progress, _exportCts.Token,
+                        fullRange: HasFullRange, quality: quality, removeAudio: _removeAudio);
                 }
                 return true;
             }
@@ -772,7 +817,7 @@ namespace ScreenCap.UI
         private void ShowFfmpegMissing()
         {
             MessageBox.Show(this,
-                "未找到 ffmpeg.exe，裁剪视频和生成 GIF 需要它。\n\n" +
+                "未找到 ffmpeg.exe，裁剪视频、调整画质、移除声音和生成 GIF 需要它。\n\n" +
                 "方式一：把 ffmpeg.exe 放到程序目录的 tools 文件夹下。\n" +
                 "方式二：在 PowerShell 执行 winget install Gyan.FFmpeg。\n" +
                 "方式三：运行项目里的 tools\\get-ffmpeg.ps1 自动下载。",

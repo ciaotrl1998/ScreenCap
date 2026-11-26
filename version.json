@@ -1,6 +1,6 @@
 {
-  "version": "1.2.15",
+  "version": "1.2.16",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "c0af1c96228aa611f5745533e1cd8b97b4d84f14b15110613777c9d0f1cf961a",
-  "notes": "整段 MP4 直接保存原文件，跳过重新编码。录制缓存保留最近 5 条。"
+  "sha256": "709ac034454ccbeb61d3117bc552e2d6afe6b11fa4c8c3685e99893324e1732f",
+  "notes": "MP4 编辑设置以录制画质为上限，超出范围置灰。已录制的系统声音可在导出时移除。GIF 设置独立应用。"
 }

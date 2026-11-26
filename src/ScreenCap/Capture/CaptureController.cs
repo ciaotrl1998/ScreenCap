@@ -181,6 +181,7 @@ namespace ScreenCap.Capture
 
             _state = State.Stopping;
             var elapsed = _recorder.Elapsed;
+            var profile = _recorder.Profile;
             _bar?.ShowSaving();
 
             string path = null;
@@ -225,7 +226,8 @@ namespace ScreenCap.Capture
 
             if (!string.IsNullOrEmpty(path) && File.Exists(path) && new FileInfo(path).Length > 1024)
             {
-                new EditorWindow(path, elapsed, _settings, _recordGif, _applyHotkey).Show();
+                profile.Save(path);
+                new EditorWindow(path, elapsed, _settings, _recordGif, _applyHotkey, profile).Show();
             }
             else
             {

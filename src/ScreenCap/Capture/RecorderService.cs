@@ -24,6 +24,7 @@ namespace ScreenCap.Capture
 
         public string OutputPath { get; private set; }
         public TimeSpan Elapsed => _stopwatch != null ? _stopwatch.Elapsed : TimeSpan.Zero;
+        internal RecordingProfile Profile { get; private set; }
 
         public RecorderService(AppSettings settings)
         {
@@ -80,10 +81,11 @@ namespace ScreenCap.Capture
                     Bottom = localY + height
                 }
             };
+            Profile = new RecordingProfile(Math.Max(10, Math.Min(100, _settings.Quality)), _settings.RecordSystemAudio);
             options.VideoEncoderOptions = new VideoEncoderOptions
             {
                 Framerate = Math.Max(15, Math.Min(120, _settings.Framerate)),
-                Quality = Math.Max(10, Math.Min(100, _settings.Quality)),
+                Quality = Profile.Quality,
                 IsFixedFramerate = true,
                 IsHardwareEncodingEnabled = true,
                 IsLowLatencyEnabled = false,
@@ -95,7 +97,7 @@ namespace ScreenCap.Capture
                     EncoderProfile = H264Profile.High
                 }
             };
-            options.AudioOptions = _settings.RecordSystemAudio
+            options.AudioOptions = Profile.SystemAudio
                 ? new AudioOptions
                 {
                     IsAudioEnabled = true,
@@ -116,7 +118,7 @@ namespace ScreenCap.Capture
                 LogSeverityLevel = LogLevel.Info
             };
 
-            Log.Info($"开始录制 {OutputPath} 区域 {localX},{localY} {width}x{height} api={(useWgc ? "WGC" : "DD")} fps={options.VideoEncoderOptions.Framerate} audio={_settings.RecordSystemAudio}");
+            Log.Info($"开始录制 {OutputPath} 区域 {localX},{localY} {width}x{height} api={(useWgc ? "WGC" : "DD")} fps={options.VideoEncoderOptions.Framerate} quality={Profile.Quality} audio={Profile.SystemAudio}");
 
             _recorder = Recorder.CreateRecorder(options);
             _completion = new TaskCompletionSource<string>();

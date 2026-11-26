@@ -112,6 +112,7 @@ namespace ScreenCap.Core
                         try
                         {
                             file.Delete();
+                            File.Delete(RecordingProfile.MetadataPath(file.FullName));
                             Log.Info("淘汰最早的视频缓存（保留最近 5 条）: " + file.FullName);
                         }
                         catch
