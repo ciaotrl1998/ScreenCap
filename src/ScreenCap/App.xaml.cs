@@ -44,7 +44,7 @@ namespace ScreenCap
             Log.Info("ScreenCap 启动");
 
             ClipboardService.CleanupOldFiles(TimeSpan.FromDays(1));
-            Log.Info("启动时清理缓存");
+            Log.Info("启动时检查视频缓存（保留最近 5 条）");
             CacheManager.Cleanup(_settings.CacheFolder);
 
             _controller = new CaptureController(_settings, ApplyHotkey);
@@ -343,7 +343,7 @@ namespace ScreenCap
             {
                 if (_settings != null)
                 {
-                    Log.Info("退出时清理缓存");
+                    Log.Info("退出时检查视频缓存（保留最近 5 条）");
                     CacheManager.Cleanup(_settings.CacheFolder);
                 }
             }

@@ -18,6 +18,7 @@ namespace ScreenCap.Capture
         private TaskCompletionSource<string> _completion;
         private Stopwatch _stopwatch;
         private bool _disposed;
+        private bool _cacheRegistered;
 
         public event Action<string> Failed;
 
@@ -123,7 +124,10 @@ namespace ScreenCap.Capture
 
             _recorder.OnRecordingComplete += OnRecordingComplete;
             _recorder.OnRecordingFailed += OnRecordingFailed;
+            CacheManager.Register(OutputPath);
+            _cacheRegistered = true;
             _recorder.Record(OutputPath);
+            CacheManager.Cleanup(_settings.CacheFolder);
         }
 
         public async Task<string> StopAsync()
@@ -160,6 +164,7 @@ namespace ScreenCap.Capture
         {
             _stopwatch?.Stop();
             Log.Info($"录制完成 {e.FilePath}");
+            CacheManager.Cleanup(_settings.CacheFolder);
             _completion?.TrySetResult(e.FilePath);
         }
 
@@ -173,31 +178,14 @@ namespace ScreenCap.Capture
 
         public static void CleanupCacheFolder(string folder, string keepPath = null)
         {
+            CacheManager.Register(keepPath);
             try
             {
-                if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder))
-                {
-                    return;
-                }
-
-                string keep = string.IsNullOrEmpty(keepPath) ? null : Path.GetFullPath(keepPath);
-                foreach (var file in Directory.GetFiles(folder, "recording*.mp4"))
-                {
-                    try
-                    {
-                        if (keep != null && string.Equals(Path.GetFullPath(file), keep, StringComparison.OrdinalIgnoreCase))
-                        {
-                            continue;
-                        }
-                        File.Delete(file);
-                    }
-                    catch
-                    {
-                    }
-                }
+                CacheManager.Cleanup(folder);
             }
-            catch
+            finally
             {
+                CacheManager.Unregister(keepPath);
             }
         }
 
@@ -303,6 +291,12 @@ namespace ScreenCap.Capture
                 Log.Error("释放录制器失败", ex);
             }
             _recorder = null;
+            if (_cacheRegistered)
+            {
+                CacheManager.Unregister(OutputPath);
+                _cacheRegistered = false;
+                CacheManager.Cleanup(_settings.CacheFolder);
+            }
         }
     }
 }

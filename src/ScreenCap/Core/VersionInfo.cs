@@ -2,6 +2,6 @@ namespace ScreenCap.Core
 {
     public static class VersionInfo
     {
-        public const string Current = "1.2.13";
+        public const string Current = "1.2.15";
     }
 }

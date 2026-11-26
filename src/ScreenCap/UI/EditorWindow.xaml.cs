@@ -533,7 +533,10 @@ namespace ScreenCap.UI
             PreviewError.Visibility = Visibility.Visible;
         }
 
-        private bool IsBusy => BusyOverlay.Visibility == Visibility.Visible;
+        private bool IsBusy => _exportCts != null;
+
+        private bool CanExportOriginal => !_isGif && (!_userAdjustedRange ||
+            (Timeline.InPoint == 0 && Timeline.OutPoint == Timeline.Duration));
 
         private async void Export_Click(object sender, RoutedEventArgs e)
         {
@@ -542,20 +545,9 @@ namespace ScreenCap.UI
                 return;
             }
 
-            if (!SourceAvailable())
+            bool copyOriginal = CanExportOriginal;
+            if (!TryPrepareExport(copyOriginal, out string ffmpeg))
             {
-                return;
-            }
-
-            if (!ValidateRange())
-            {
-                return;
-            }
-
-            string ffmpeg = FfmpegLocator.Find(_settings.FfmpegPath);
-            if (ffmpeg == null)
-            {
-                ShowFfmpegMissing();
                 return;
             }
 
@@ -565,16 +557,11 @@ namespace ScreenCap.UI
                 return;
             }
 
-            double start = Timeline.InPoint;
-            double length = Timeline.OutPoint - Timeline.InPoint;
             bool ok = await RunExporterAsync(
                 ffmpeg,
-                _sourcePath,
-                start,
-                length,
                 target,
                 _isGif ? "正在导出 GIF…" : "正在导出…",
-                _isGif);
+                copyOriginal);
             if (ok)
             {
                 _lastOutputPath = target;
@@ -590,58 +577,20 @@ namespace ScreenCap.UI
                 return;
             }
 
-            if (!SourceAvailable())
+            bool copyOriginal = CanExportOriginal;
+            if (!TryPrepareExport(copyOriginal, out string ffmpeg))
             {
                 return;
             }
 
-            if (!ValidateRange())
-            {
-                return;
-            }
-
-            Directory.CreateDirectory(ClipboardService.ClipboardDirectory);
             string extension = _isGif ? ".gif" : ".mp4";
             string path = Path.Combine(
                 ClipboardService.ClipboardDirectory,
                 _baseName + "_" + DateTime.Now.ToString("HHmmss") + extension);
 
-            bool fullRange = Timeline.InPoint <= 0.02 && Timeline.OutPoint >= Timeline.Duration - 0.02;
-            if (!_isGif && fullRange)
+            if (!await RunExporterAsync(ffmpeg, path, _isGif ? "正在准备 GIF…" : "正在准备复制…", copyOriginal))
             {
-                try
-                {
-                    File.Copy(_sourcePath, path, true);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("复制缓存文件失败", ex);
-                    MessageBox.Show(this, "复制文件失败：\n" + ex.Message, "ScreenCap", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-            }
-            else
-            {
-                string ffmpeg = FfmpegLocator.Find(_settings.FfmpegPath);
-                if (ffmpeg == null)
-                {
-                    ShowFfmpegMissing();
-                    return;
-                }
-
-                double start = Timeline.InPoint;
-                double length = Timeline.OutPoint - Timeline.InPoint;
-                if (!await RunExporterAsync(
-                        ffmpeg,
-                        _sourcePath,
-                        start,
-                        length,
-                        path,
-                        _isGif ? "正在准备 GIF…" : "正在准备复制…",
-                        _isGif))
-                {
-                    return;
-                }
+                return;
             }
 
             try
@@ -656,6 +605,32 @@ namespace ScreenCap.UI
                 Log.Error("复制到剪贴板失败", ex);
                 MessageBox.Show(this, "复制到剪贴板失败：\n" + ex.Message, "ScreenCap", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private bool TryPrepareExport(bool copyOriginal, out string ffmpeg)
+        {
+            ffmpeg = null;
+            if (!SourceAvailable())
+            {
+                return false;
+            }
+            if (copyOriginal)
+            {
+                return true;
+            }
+            if (!ValidateRange())
+            {
+                return false;
+            }
+
+            ffmpeg = FfmpegLocator.Find(_settings.FfmpegPath);
+            if (ffmpeg != null)
+            {
+                return true;
+            }
+
+            ShowFfmpegMissing();
+            return false;
         }
 
         private bool SourceAvailable()
@@ -679,18 +654,31 @@ namespace ScreenCap.UI
             return true;
         }
 
-        private async Task<bool> RunExporterAsync(string ffmpeg, string input, double start, double duration, string output, string title, bool gif)
+        private async Task<bool> RunExporterAsync(string ffmpeg, string output, string title, bool copyOriginal)
         {
             _exportCts = new CancellationTokenSource();
             var startedAt = Stopwatch.StartNew();
-            ShowBusy(title);
 
             try
             {
-                var progress = new Progress<double>(SetBusyProgress);
-                if (gif)
+                string input = Path.GetFullPath(_sourcePath);
+                output = Path.GetFullPath(output);
+                if (string.Equals(input, output, StringComparison.OrdinalIgnoreCase))
                 {
-                    await FfmpegExporter.ExportGifAsync(ffmpeg, input, start, duration, output, _isGif ? _settings.GifFramerate : 15, _settings.GifMaxColors, _settings.GifDither, _settings.GifMaxWidth, progress, _exportCts.Token);
+                    throw new IOException("请选择与录制缓存不同的导出路径。");
+                }
+
+                double start = Timeline.InPoint;
+                double duration = Timeline.OutPoint - start;
+                ShowBusy(title);
+                var progress = new Progress<double>(SetBusyProgress);
+                if (copyOriginal)
+                {
+                    await OriginalVideoExporter.CopyAsync(input, output, progress, _exportCts.Token);
+                }
+                else if (_isGif)
+                {
+                    await FfmpegExporter.ExportGifAsync(ffmpeg, input, start, duration, output, _settings.GifFramerate, _settings.GifMaxColors, _settings.GifDither, _settings.GifMaxWidth, progress, _exportCts.Token);
                 }
                 else
                 {
@@ -784,7 +772,7 @@ namespace ScreenCap.UI
         private void ShowFfmpegMissing()
         {
             MessageBox.Show(this,
-                "未找到 ffmpeg.exe，导出和复制需要它。\n\n" +
+                "未找到 ffmpeg.exe，裁剪视频和生成 GIF 需要它。\n\n" +
                 "方式一：把 ffmpeg.exe 放到程序目录的 tools 文件夹下。\n" +
                 "方式二：在 PowerShell 执行 winget install Gyan.FFmpeg。\n" +
                 "方式三：运行项目里的 tools\\get-ffmpeg.ps1 自动下载。",
@@ -1027,45 +1015,11 @@ namespace ScreenCap.UI
                 catch
                 {
                 }
+                CacheManager.Unregister(_sourcePath);
+                CacheManager.Cleanup(_settings.CacheFolder);
             });
 
-            DeleteCachedSource();
             DeletePoster();
-            CacheManager.Unregister(_sourcePath);
-        }
-
-        private void DeleteCachedSource()
-        {
-            try
-            {
-                string cacheDirectory = Path.GetFullPath(_settings.CacheFolder);
-                string source = Path.GetFullPath(_sourcePath);
-                if (!source.StartsWith(cacheDirectory, StringComparison.OrdinalIgnoreCase))
-                {
-                    return;
-                }
-
-                for (int attempt = 0; attempt < 10; attempt++)
-                {
-                    try
-                    {
-                        if (!File.Exists(source))
-                        {
-                            return;
-                        }
-                        File.Delete(source);
-                        Log.Info("删除缓存(关闭剪辑窗): " + source);
-                        return;
-                    }
-                    catch
-                    {
-                        Thread.Sleep(60);
-                    }
-                }
-            }
-            catch
-            {
-            }
         }
 
         private void DeletePoster()

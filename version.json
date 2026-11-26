@@ -1,6 +1,6 @@
 {
-  "version": "1.2.13",
+  "version": "1.2.15",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "9ffcf7fd14701d319cad50ff77400ee5c7fbf49e017ecb64c3f0030984c422d5",
-  "notes": "控制栏持续置顶；剪辑窗新增设置按钮；拖动首尾帧时保持当前帧位置，仅在区间缩过当前帧时随边界移动。"
+  "sha256": "c0af1c96228aa611f5745533e1cd8b97b4d84f14b15110613777c9d0f1cf961a",
+  "notes": "整段 MP4 直接保存原文件，跳过重新编码。录制缓存保留最近 5 条。"
 }

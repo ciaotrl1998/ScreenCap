@@ -6,7 +6,7 @@ Windows 10/11 屏幕录制与 GIF 工具：
 - 支持任意显示器、框选后拖动边框调整区域，选区右键取消。
 - 录制时可选择「GIF / 视频」，视频为 H.264 MP4，支持系统声音。
 - 内置剪辑窗：时间轴裁剪、GIF 导出、复制视频到剪贴板。
-- 导出时可自选目录和文件名，并记住上次使用的目录。
+- 导出时可自选目录和文件名，并记住上次使用的目录。保留整段视频时直接保存原始 MP4，跳过重新编码。
 - 启动时检查主分支上的新版本，发现更新可一键下载、替换并重启，无需重新安装。
 - 设置（快捷键、画质、录制声音）持久化到 `%LOCALAPPDATA%\ScreenCap\settings.json`。
 
@@ -27,7 +27,7 @@ src\ScreenCap\bin\x64\Release\net48\ScreenCap.exe
 运行依赖：
 
 - `libvlc`、视频预览所需 DLL 由 NuGet 包 `VideoLAN.LibVLC.Windows` 输出到构建目录。
-- `tools\ffmpeg.exe` 用于 GIF/视频导出。仓库不提交该文件，可执行 `tools\get-ffmpeg.ps1` 下载，或自行放置 ffmpeg.exe。
+- `tools\ffmpeg.exe` 用于生成 GIF 和导出裁剪后的视频。仓库不提交该文件，可执行 `tools\get-ffmpeg.ps1` 下载，或自行放置 ffmpeg.exe。
 - 导出需要系统安装 Microsoft Visual C++ 2015-2022 运行库（ScreenRecorderLib 依赖）。
 
 ## 自动更新
@@ -111,4 +111,4 @@ dist/installer/         安装包脚本
 
 - 更新检查只访问上述 GitHub 地址，不上传任何本地数据。
 - 设置、日志、缓存均位于 `%LOCALAPPDATA%\ScreenCap`。
-- 录制缓存会在启动/退出时清理；关闭剪辑窗会删除对应缓存源文件。
+- 视频缓存最多保留最近 5 条；启动、退出和录制完成时只淘汰超过数量限制的最早缓存。关闭剪辑窗不会直接删除视频，正在录制或剪辑使用中的缓存会延后淘汰。
