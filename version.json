@@ -1,6 +1,6 @@
 {
-  "version": "1.2.16",
+  "version": "1.2.17",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "709ac034454ccbeb61d3117bc552e2d6afe6b11fa4c8c3685e99893324e1732f",
-  "notes": "MP4 编辑设置以录制画质为上限，超出范围置灰。已录制的系统声音可在导出时移除。GIF 设置独立应用。"
+  "sha256": "449cf9f179b67f0be7888396da90f51a915c8efafdc3c2a42aee467ef7cfdca6",
+  "notes": "视频编辑只显示导出画质和声音，GIF 编辑只显示 GIF 质量和帧率。视频画质上限取自录制设置，已录制的声音可在导出时移除。"
 }

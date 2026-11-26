@@ -74,6 +74,7 @@ namespace ScreenCap.UI
                 return;
             }
 
+            GifSettingsPanel.Visibility = Visibility.Collapsed;
             QualityLabel.Text = "导出画质";
             AutomationProperties.SetName(QualitySlider, QualityLabel.Text);
             if (recordedQuality.HasValue)
@@ -339,11 +340,14 @@ namespace ScreenCap.UI
                     _settings.Quality = VideoQuality;
                     _settings.RecordSystemAudio = IncludeSound;
                 }
-                _settings.GifFramerate = (int)Math.Round(GifFpsSlider.Value);
-                _settings.GifMaxColors = (int)Math.Round(GifColorsSlider.Value);
-                _settings.GifDither = GifDitherCheck.IsChecked == true;
-                _settings.GifMaxWidth = (int)Math.Round(GifWidthSlider.Value);
-                _settings.GifQualityLevel = _gifQualityLevel;
+                if (GifSettingsPanel.Visibility == Visibility.Visible)
+                {
+                    _settings.GifFramerate = (int)Math.Round(GifFpsSlider.Value);
+                    _settings.GifMaxColors = (int)Math.Round(GifColorsSlider.Value);
+                    _settings.GifDither = GifDitherCheck.IsChecked == true;
+                    _settings.GifMaxWidth = (int)Math.Round(GifWidthSlider.Value);
+                    _settings.GifQualityLevel = _gifQualityLevel;
+                }
                 _settings.Save();
                 DialogResult = true;
                 Close();
