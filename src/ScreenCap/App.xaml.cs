@@ -53,6 +53,7 @@ namespace ScreenCap
                 () => Dispatcher.BeginInvoke(new Action(() => CheckForUpdates(true))),
                 () => Dispatcher.BeginInvoke(new Action(OpenSettings)),
                 OpenRecordingsFolder,
+                OpenLogFolder,
                 () => Dispatcher.BeginInvoke(new Action(ExitApplication)));
 
             _hotkey = new HotkeyWindow();
@@ -279,6 +280,18 @@ namespace ScreenCap
             catch (Exception ex)
             {
                 Log.Error("打开录制文件夹失败", ex);
+            }
+        }
+
+        private void OpenLogFolder()
+        {
+            try
+            {
+                Process.Start("explorer.exe", "\"" + Log.DataDirectory + "\"");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("打开日志文件夹失败", ex);
             }
         }
 

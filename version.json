@@ -1,6 +1,6 @@
 {
-  "version": "1.2.17",
+  "version": "1.2.18",
   "url": "https://raw.githubusercontent.com/ciaotrl1998/ScreenCap/main/update/ScreenCap.exe",
-  "sha256": "449cf9f179b67f0be7888396da90f51a915c8efafdc3c2a42aee467ef7cfdca6",
-  "notes": "视频编辑只显示导出画质和声音，GIF 编辑只显示 GIF 质量和帧率。视频画质上限取自录制设置，已录制的声音可在导出时移除。"
+  "sha256": "6cf20bd411171f36fd8b2732d3e2a9186c344204ac8551c8eb273cda2635b669",
+  "notes": "托盘右键菜单新增「打开日志文件夹」，可直接查看应用日志和录制器日志。"
 }

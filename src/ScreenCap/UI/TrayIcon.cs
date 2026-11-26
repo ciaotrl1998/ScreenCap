@@ -12,13 +12,15 @@ namespace ScreenCap.UI
         private readonly NotifyIcon _notifyIcon;
         private DateTime _lastStartClick = DateTime.MinValue;
 
-        public TrayIcon(Action startRecording, Action checkUpdate, Action openHotkeySettings, Action openFolder, Action exit)
+        public TrayIcon(Action startRecording, Action checkUpdate, Action openHotkeySettings,
+            Action openRecordingsFolder, Action openLogFolder, Action exit)
         {
             var menu = new ContextMenuStrip();
             menu.Items.Add("开始录制", null, (s, e) => startRecording());
             menu.Items.Add("检查更新", null, (s, e) => checkUpdate());
             menu.Items.Add("设置", null, (s, e) => openHotkeySettings());
-            menu.Items.Add("打开录制文件夹", null, (s, e) => openFolder());
+            menu.Items.Add("打开录制文件夹", null, (s, e) => openRecordingsFolder());
+            menu.Items.Add("打开日志文件夹", null, (s, e) => openLogFolder());
             menu.Items.Add(new ToolStripSeparator());
             menu.Items.Add("退出", null, (s, e) => exit());
 
